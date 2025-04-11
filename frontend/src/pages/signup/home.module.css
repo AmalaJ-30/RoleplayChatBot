@@ -1,0 +1,95 @@
+.homeContainer {
+  justify-content: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  flex-direction: column;
+  padding: 20px;
+  text-align: center;
+}
+
+.pageWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100vw;
+  background-color: inherit;
+}
+.title {
+  color: #df77f2;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.highlightText {
+  color: #ffffff;
+  font-weight: bold;
+}
+.loginBox {
+  background-color: #0d0b40;
+  padding: 40px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+.loginForm {
+  background-color: #0d0b40;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  margin-top: 20;
+}
+
+.inputField {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: none;
+  font-size: 14px;
+}
+
+.loginButton {
+  background-color: #c972cf;
+  color: white;
+  border: none;
+  padding: 12px;
+  margin-top: 15px;
+  border-radius: 5px;
+  font-weight: bold;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.loginButton:hover {
+  background-color: #a44fb2;
+}
+
+.warningText {
+  color: rgb(128, 46, 46);
+  font-weight: bold;
+  margin-top: 20px;
+  max-width: 400px;
+  text-align: center; /* 👈 THIS is what you're missing */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.disclaimer {
+  font-size: 14px;
+  color: gray;
+  margin-top: 10px;
+  max-width: 400px;
+  text-align: center; /* 👈 Same deal */
+  margin-left: auto;
+  margin-right: auto;
+}

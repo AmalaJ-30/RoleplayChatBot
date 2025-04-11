@@ -8,23 +8,24 @@ from langchain_core.messages import AIMessage
 from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-Person = input("Famous person: ")
-Occupation = input("Role you want them to play: ")
-prompt = ChatPromptTemplate.from_messages(
-    [
-        (
-            "system",
-            f"You are {Person}, a {Occupation}. Answer all questions as if you are {Person}."
-        ),
-        MessagesPlaceholder(variable_name="messages"),
-    ]
-)
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
+app = FastAPI()
+
+# Allow frontend to talk to backend (CORS)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can tighten this later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 os.environ["LANGCHAIN_TRACKING_V2"] = "true"
 os.environ["OPENAI_API_KEY"] = "sk-_d9LhKLJqxPn7NRVyLIaHdLz-SPym78EU3bbyoF_3ZT3BlbkFJPMEVpxHLNeJ__88VWhgNceFipHzM7TkF80lhAsf8QA"
 model = ChatOpenAI(model="gpt-3.5-turbo")
-chain = prompt | model
 store = {}
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
@@ -32,32 +33,27 @@ def get_session_history(session_id: str) -> BaseChatMessageHistory:
     return store[session_id]
 
 
-with_message_history = RunnableWithMessageHistory(chain, get_session_history)
-config = {"configurable": {"session_id": "1"}}
-
-
 
 #.invoke([HumanMessage(content="Hi! I'm Bob")])
-
+class ChatRequest(BaseModel):
+    session_id: str
+    person: str
+    role: str
+    message: str
 print("Start chat")
-while True:
-    user_input = input("You: ")
-    if user_input.lower() == "exit":
-        print("Ending the chat. Goodbye!")
-        break
-    if user_input=="change id":
-        uin = input("chat id: ")
-        config = {"configurable": {"session_id": uin}}
-        print("chat id changed to "+ uin)
-        continue
+@app.post("/chat")
+async def chat_endpoint(request: ChatRequest):
+    config = {"configurable": {"session_id": request.session_id}}
 
-    try:
-        response = with_message_history.invoke([HumanMessage(content=user_input)], config=config)
-        #response = chain.invoke({"messages": [HumanMessage(content="hi! I'm bob")]})
+    prompt = ChatPromptTemplate.from_messages([
+        (
+            "system",
+            f"You are {request.person}, a {request.role}. Answer all questions as if you are {request.person}."
+        ),
+        MessagesPlaceholder(variable_name="messages"),
+    ])
+    chain = prompt | model
+    with_message_history = RunnableWithMessageHistory(chain, get_session_history)
 
-
-        print(f"AI: {response.content}")
-    except AttributeError as e:
-        print("Error:", e)
-        print("The session history might not be initialized correctly.")
-        break
+    response = with_message_history.invoke([HumanMessage(content=request.message)], config=config)
+    return {"reply": response.content}
