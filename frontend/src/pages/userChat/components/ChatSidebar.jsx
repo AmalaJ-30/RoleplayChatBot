@@ -1,18 +1,26 @@
 import React from "react";
-import ChatSidebar from "./components/ChatSidebar";
+import styles from "./ChatSidebar.module.css";
 
-const ChatSidebar = ({ chats, onSelectChat, onStartNew }) => {
+const ChatSidebar = ({ chats, activeChatId, onSelectChat, onStartNew, theme }) => {
   return (
-    <div className={styles.sidebar}>
-      <h2 className={styles.header}>Chats</h2>
-      <button className={styles.newChat} onClick={onStartNew}>+ New Chat</button>
-      <div className={styles.chatList}>
-        {chats.map((chat, index) => (
-          <div key={index} className={styles.chatItem} onClick={() => onSelectChat(chat.session_id)}>
+    <div className={`${styles.sidebar} ${theme === "dark" ? styles.sidebarDark : styles.sidebarLight}`}>
+      <h3>Chats</h3>
+
+      <button className={styles.newChat} onClick={onStartNew}>
+        + New Chat
+      </button>
+
+      <ul className={styles.chatList}>
+        {chats.map((chat) => (
+          <li
+            key={chat.session_id}
+            className={`${styles.chatItem} ${chat.session_id === activeChatId ? styles.active : ""}`}
+            onClick={() => onSelectChat(chat.session_id)}
+          >
             <strong>{chat.person}</strong> as <em>{chat.role}</em>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
