@@ -1,12 +1,13 @@
 .sidebar {
-  width: 200;
   background-color: #1f1f1f;
   color: white;
   height: 100vh;
-  padding: 0.5rem;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
+  width: 280px; /* ⬅️ Increase from e.g. 180px or 200px */
+  min-width: 260px;
+  padding: 1rem;
 }
 
 .header {
@@ -42,10 +43,13 @@
   align-items: center;
   gap: 0.5rem;
   white-space: nowrap;
-  overflow: hidden;
+  position: relative;  /* 🔑 anchor for absolute dropdown */
+  overflow: visible;   /* ✅ prevents clipping */
+  padding-right: 2rem; /* room for 3-dot button + dropdown */
 }
 .chatItem:hover {
-  background-color: #3d3d3d;
+  background-color: #2c0a3c;
+  color: white;
 }
 
 .chatText {
@@ -56,7 +60,8 @@
   white-space: nowrap;
 }
 .active {
-  background: #444;
+  background: #2c0a3c;
+  color: white;
   font-weight: bold;
 }
 
@@ -91,20 +96,26 @@
 
 .dropdown {
   position: absolute;
-  background: #333;
-  padding: 0.3rem 0.5rem;
-  border-radius: 4px;
+  z-index: 999;
+  background: var(--menu-bg, white);
+  padding: 0.5rem;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
+
   top: 100%;
   right: 0;
-  z-index: 100;
-  font-size: 0.85rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  margin-top: 0.25rem;
+  background-color: var(--menu-bg, white);
+  min-width: 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;      
 }
 
 .dropdown button {
-  background: none;
+  background: gray;
   border: none;
-  color: white;
+  color: rgb(209, 166, 214);
   cursor: pointer;
   padding: 6px;
   width: 100%;
@@ -112,5 +123,5 @@
 }
 
 .dropdown button:hover {
-  background: red;
+  background: rgb(194, 44, 154);
 }

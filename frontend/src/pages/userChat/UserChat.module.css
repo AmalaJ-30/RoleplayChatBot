@@ -89,14 +89,15 @@
 
 .user {
   align-self: flex-end;
-  background-color: #9452ad;
+  background-color: #2c0a3c;
   color: white;
 }
 
 .ai {
   align-self: flex-start;
-  background-color: #ddd;
-  color: black;
+  background-color: black;
+  color: rgb(255, 255, 255);
+  /*#2c0a3c*/
 }
 
 /* Message Input */
@@ -105,7 +106,7 @@
   width: 90%;
   max-width: 600px;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  background:none;
   border-radius: 10px;
 }
 
@@ -120,7 +121,7 @@
 .sendButton {
   padding: 10px;
   margin-left: 10px;
-  background: #007bff;
+  background: #a314dc;
   color: white;
   border: none;
   cursor: pointer;
@@ -129,5 +130,5 @@
 }
 
 .sendButton:hover {
-  background: #0056b3;
+  background: #a314dc;
 }

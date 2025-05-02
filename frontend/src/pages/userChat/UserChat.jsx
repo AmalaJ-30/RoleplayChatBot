@@ -11,11 +11,60 @@ function UserChat() {
   const [selectionLocked, setSelectionLocked] = useState(false);
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
+  const [loadedFromStorage, setLoadedFromStorage] = useState(false);
 
+  // 1. Set theme first (dark/light)
   useEffect(() => {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     setTheme(prefersDark ? "dark" : "light");
   }, []);
+
+  // 2. Load chatList and activeChatId first
+  useEffect(() => {
+    const saved = JSON.parse(localStorage.getItem("chatList"));
+    console.log("Loaded chatList from localStorage:", saved);
+    if (saved) {
+      const restored = saved.map(chat => {
+        const savedData = JSON.parse(localStorage.getItem(chat.session_id)) || {};
+        return {
+          ...chat,
+          messages: savedData.messages || []
+        };
+      });
+      setChats(restored);
+    }
+
+    const last = localStorage.getItem("lastActiveChatId");
+    if (last) {
+      setActiveChatId(last);
+    }
+
+    setLoadedFromStorage(true);
+  }, []);
+
+  // 3. Load messages for selected chat
+  useEffect(() => {
+    if (activeChatId) {
+      const savedData = JSON.parse(localStorage.getItem(activeChatId));
+      if (savedData && savedData.messages) {
+        setConversation(savedData.messages);
+      }
+    }
+  }, [activeChatId]);
+
+  // 4. Save active chatId
+  useEffect(() => {
+    if (activeChatId) {
+      localStorage.setItem("lastActiveChatId", activeChatId);
+    }
+  }, [activeChatId]);
+
+  // 5. Save chat list after storage is loaded
+  useEffect(() => {
+    if (loadedFromStorage) {
+      localStorage.setItem("chatList", JSON.stringify(chats));
+    }
+  }, [chats, loadedFromStorage]);
 
   const handleSendMessage = async () => {
     if (!activeChatId || message.trim() === "") return;
@@ -28,7 +77,7 @@ function UserChat() {
     setConversation(prev => [...prev, userMessage]);
   
     try {
-      const response = await fetch("https://silver-space-computing-machine-jj7p6pjjr4rqhp697-8000.app.github.dev/chat", {
+      const response = await fetch("http://localhost:8000/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -115,6 +164,34 @@ function UserChat() {
     setConversation(chat.messages || []);
     setSelectionLocked(true);
   };
+  
+  const handleDeleteChat = (sessionId) => {
+    setChats(prevChats => prevChats.filter(chat => chat.session_id !== sessionId));
+  
+    if (sessionId === activeChatId) {
+      setActiveChatId(null);
+    }
+  
+    localStorage.removeItem(sessionId); // removes from everywhere
+  };
+  
+  const handleRenameChat = (sessionId, newPerson, newRole) => {
+    setChats(prevChats =>
+      prevChats.map(chat =>
+        chat.session_id === sessionId
+          ? { ...chat, person: newPerson, role: newRole }
+          : chat
+      )
+    );
+  
+    const chatData = JSON.parse(localStorage.getItem(sessionId));
+    if (chatData) {
+      localStorage.setItem(
+        sessionId,
+        JSON.stringify({ ...chatData, person: newPerson, role: newRole })
+      );
+    }
+  };
 
   return (
       <div className={`${styles.pageWrapper} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
@@ -126,6 +203,8 @@ function UserChat() {
           activeChatId={activeChatId}
           onSelectChat={handleSelectChat}
           onStartNew={handleStartNewChat}
+          onDeleteChat={handleDeleteChat}
+          onRenameChat={handleRenameChat}
           theme={theme}
         />
   

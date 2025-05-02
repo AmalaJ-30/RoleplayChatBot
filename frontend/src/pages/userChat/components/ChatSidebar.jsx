@@ -2,13 +2,20 @@ import React, { useState } from "react";
 import styles from "./ChatSidebar.module.css";
 
 
-const ChatSidebar = ({ chats, activeChatId, onSelectChat, onStartNew, onDeleteChat, theme }) => {
+const ChatSidebar = ({ chats, activeChatId, onSelectChat, onStartNew, onDeleteChat, onRenameChat, theme }) => {
   
 const [openMenuId, setOpenMenuId] = useState(null);
 const toggleMenu = (id) => {
   setOpenMenuId(prev => (prev === id ? null : id));
 };
 
+const handleRename = (sessionId) => {
+  const newPerson = prompt("New person name?");
+  const newRole = prompt("New role name?");
+  if (newPerson && newRole) {
+    onRenameChat(sessionId, newPerson, newRole);
+  }
+};
   return (
     <div className={`${styles.sidebar} ${theme === "dark" ? styles.sidebarDark : styles.sidebarLight}`}>
       <h3>Chats</h3>
@@ -38,8 +45,8 @@ const toggleMenu = (id) => {
 
           {openMenuId === chat.session_id && (
             <div className={styles.dropdown}>
-              <button onClick={() => onDeleteChat(chat.session_id)}>Delete</button>
-              {/* Future: <button>Rename</button> etc. */}
+              <button onClick={() => onDeleteChat(chat.session_id)}> 🚮 Delete</button>
+              <button onClick={() => handleRename(chat.session_id)}> ✒️ Rename</button>
             </div>
           )}
         </div>
