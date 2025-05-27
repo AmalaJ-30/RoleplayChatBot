@@ -20,14 +20,18 @@ const handleRename = (sessionId) => {
     <div className={`${styles.sidebar} ${theme === "dark" ? styles.sidebarDark : styles.sidebarLight}`}>
       <h3>Chats</h3>
 
-      <button className={styles.newChat} onClick={onStartNew}>
-        + New Chat
-      </button>
+      <button
+  className={styles.newChat}
+  onClick={() => {
+    console.log("New chat clicked");
+    onStartNew();
+  }}
+>
+  + New Chat
+</button>
 
       <ul className={styles.chatList}>
-      {chats
-        .filter(chat => chat.person.trim() && chat.role.trim())
-        .map((chat) => (
+      {chats.map((chat) => (
           <li
             key={chat.session_id}
             className={`${styles.chatItem} ${chat.session_id === activeChatId ? styles.active : ""}`}

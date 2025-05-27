@@ -136,17 +136,7 @@ function UserChat() {
   };
   
   const handleStartNewChat = () => {
-    const newId = crypto.randomUUID(); // creates unique session_id
-  
-    const newChat = {
-      session_id: newId,
-      person: "",
-      role: "",
-      messages: [],
-    };
-  
-    setChats(prev => [...prev, newChat]);
-    setActiveChatId(newId);
+    // Just reset the state and unlock input — no chat is created yet
     setPerson("");
     setRole("");
     setMessage("");
@@ -208,66 +198,69 @@ function UserChat() {
           theme={theme}
         />
   
-        {/* Main Chat Area */}
-        <div className={`${styles.userchatContainer} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
-  
-          <button
-            className={styles.themeToggle}
-            onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-          >
-            {theme === "light" ? "Dark Mode" : "Light Mode"}
-          </button>
-  
-          {!selectionLocked && (
-            <div className={styles.selectionBox}>
-              <input
-                type="text"
-                placeholder="Enter a famous person"
-                value={person}
-                onChange={(e) => setPerson(e.target.value)}
-                className={styles.chatboxInput}
-              />
-              <input
-                type="text"
-                placeholder="Enter their role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className={styles.chatboxInput}
-              />
-              <button onClick={handleSelection} className={styles.sendButton}>
-                Start Chat
-              </button>
-            </div>
-          )}
-  
-          <div className={styles.chatbox}>
-            {conversation.map((msg, index) => (
-              <div key={index} className={`${styles.chatBubble} ${styles[msg.sender]}`}>
-                {msg.text}
-              </div>
-            ))}
-          </div>
-  
-          <div className={styles.messageInput}>
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              disabled={!selectionLocked}
-              className={styles.input}
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={!selectionLocked}
-              className={styles.sendButton}
-            >
-              Send
-            </button>
-          </div>
-  
-        </div>
+ {/* Main Chat Area */}
+<div className={`${styles.userchatContainer} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
+
+<button
+  className={styles.themeToggle}
+  onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+>
+  {theme === "light" ? "Dark Mode" : "Light Mode"}
+</button>
+
+{!selectionLocked && (
+  <div className={styles.selectionBox}>
+    <input
+      type="text"
+      placeholder="Enter a famous person"
+      value={person}
+      onChange={(e) => setPerson(e.target.value)}
+      className={styles.chatboxInput}
+    />
+    <input
+      type="text"
+      placeholder="Enter their role"
+      value={role}
+      onChange={(e) => setRole(e.target.value)}
+      className={styles.chatboxInput}
+    />
+    <button onClick={handleSelection} className={styles.sendButton}>
+      Start Chat
+    </button>
+  </div>
+)}
+
+<div className={styles.chatMain}>
+  <div className={styles.chatbox}>
+    {conversation.map((msg, index) => (
+      <div key={index} className={`${styles.chatBubble} ${styles[msg.sender]}`}>
+        {msg.text}
       </div>
+    ))}
+  </div>
+
+  <div className={styles.messageInput}>
+  <div className={styles.inputWrapper}>
+    <input
+      type="text"
+      placeholder="Type a message..."
+      value={message}
+      onChange={(e) => setMessage(e.target.value)}
+      disabled={!selectionLocked}
+      className={styles.input}
+    />
+    <button
+      onClick={handleSendMessage}
+      disabled={!selectionLocked}
+      className={styles.sendButton}
+    >
+      Send
+    </button>
+    </div>
+  </div>
+</div>
+</div>
+    </div>
     </div>
   );
 }
