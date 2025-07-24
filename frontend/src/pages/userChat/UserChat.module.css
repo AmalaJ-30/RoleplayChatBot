@@ -64,13 +64,25 @@ body {
   flex-wrap: wrap;
   justify-content: center;
 }
-
+/* 67 - 86 handle the famous person name and role text boxes at the top to make sure they change to light and dark mode accordingly*/
 .chatboxInput {
   padding: 10px;
   border: none;
   border-radius: 5px;
   font-size: 14px;
   width: 200px;
+}
+
+/* Light mode */
+.themeLight .chatboxInput {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Dark mode */
+.themeDark .chatboxInput {
+  background-color: #333333;
+  color: #ffffff;
 }
 
 /* Chatbox */
