@@ -1,4 +1,8 @@
-import postmark from "postmark";
+
+import dotenv from 'dotenv';
+dotenv.config();
+
+import postmark from 'postmark';
 const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 
 export async function sendVerificationEmail(to, token) {
@@ -19,9 +23,3 @@ export async function sendVerificationEmail(to, token) {
     TextBody: `Visit this link to verify your account: ${verifyUrl}`
   });
 }
-
-module.exports = {
-  sendVerificationEmail,
-  // future: sendPasswordResetEmail, sendNotificationEmail, etc.
-};
-//From: process.env.POSTMARK_SENDER
