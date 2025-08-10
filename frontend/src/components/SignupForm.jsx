@@ -1,11 +1,14 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SignupForm({
   inputClass = "",
   buttonClass = "",
   formClass = ""
 }) {
-
+    
+    
+const navigate = useNavigate();
     const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -30,7 +33,8 @@ export default function SignupForm({
 
       const data = await response.json();
       if (response.ok) {
-        alert("Signup successful!");
+        alert(`Signup successful! Please expect an email from "CampusMind" and verify your email address to be able to login`);
+        navigate("/");
         console.log(data);
       } else {
         alert(data.message || "Signup failed");

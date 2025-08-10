@@ -1,13 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./home.module.css";
 
 function Home() {
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  const handleLogin = () => {
-    navigate("/userChat"); // Redirects to the chat page
-  }
+  const handleLogin = async () => {
+    setError(""); // Clear old errors
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ username, password }),
+});
+
+      if (res.status === 403) {
+        setError("Please verify your email before logging in.");
+        return;
+      }
+
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.message || "Login failed.");
+        return;
+      }
+
+      // If success
+      // const data = await res.json(); // Optionally read backend data
+      navigate("/userChat");
+
+    } catch (err) {
+      console.error(err);
+      setError("Server error. Try again later.");
+    }
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -20,8 +50,20 @@ function Home() {
         </h1>
 
         <div className={styles.loginForm}>
-          <input type="text" placeholder="Username" className={styles.inputField} />
-          <input type="password" placeholder="Password" className={styles.inputField} />
+         <input
+  type="text"
+  placeholder="Username"
+  className={styles.inputField}
+  value={username}
+  onChange={(e) => setUsername(e.target.value)}
+/>
+<input
+  type="password"
+  placeholder="Password"
+  className={styles.inputField}
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+/>
           <button className={styles.loginButton} onClick={handleLogin}>Login</button>
         </div>
 
