@@ -75,18 +75,16 @@ if (!token) {
   const user = await User.findOne({ verificationToken: token });
   if (!user) return res.status(400).json({ message: "Invalid token" });
 
-  if (approve === "true") {
+if (approve === "true") {
     user.verified = true;
     user.verificationToken = undefined; // clear token so it can’t be reused
     await user.save();
     return res.json({ message: "Email verified successfully" });
   } else {
-    user.verificationRejected = true; // mark as rejected
-    user.verificationToken = undefined;
-    await user.save();
-    return res.json({ message: "Verification request rejected" });
+    // ❌ Delete the user on rejection
+    await User.deleteOne({ _id: user._id });
+    return res.status(403).json({ message: "Email verification was rejected. Please sign up again." });
   }
-  
 });
 
 router.post('/login', async (req, res) => {
@@ -97,21 +95,17 @@ router.post('/login', async (req, res) => {
     // 1️⃣ Find user
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(400).json({ message: "Invalid username or password" });
+      return res.status(400).json({ message: "Invalid username or password. Please sign up first, if you did, you may have rejected your verification email" });
     }
     
-    if (user.verificationRejected) {
-  return res.status(403).json({ message: "You have rejected email verification. Please sign up again." });
-}
-    // 2️⃣ Check if verified
     if (!user.verified) {
-      return res.status(403).json({ message: "Please verify your email before logging in." });
+      return res.status(403).json({ message: "Please verify your email before logging in. If you recently signed up but chose to reject the verification email, you’ll need to register again." });
     }
 
     // 3️⃣ Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid username or password" });
+      return res.status(400).json({ message: "We cannot find you in our system, please make sure your username and password are correct" });
     }
 
     // 4️⃣ Success

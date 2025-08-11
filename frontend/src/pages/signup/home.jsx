@@ -20,14 +20,15 @@ function Home() {
   body: JSON.stringify({ username, password }),
 });
 
-      if (res.status === 403) {
-        setModalMessage("Please check your email for a message from CampusMind and verify your email in order to log in.");
-        return;
-      }
+     if (res.status === 403) {
+  const data = await res.json();
+  setModalMessage(data.message || "Login failed.");
+  return;
+} //take out the numbers from the invalid maessages
 
       if (!res.ok) {
   const data = await res.json();
-  setModalMessage(data.message || "Invalid username or password.");
+  setModalMessage(data.message || "Invalid username or password 3.");
   return;
 }
 
