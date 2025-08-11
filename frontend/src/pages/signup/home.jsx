@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./home.module.css";
+import Modal from "../../components/Modal.jsx"; 
 
 function Home() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [modalMessage, setModalMessage] = useState("");
 
   const handleLogin = async () => {
     setError(""); // Clear old errors
@@ -19,15 +21,16 @@ function Home() {
 });
 
       if (res.status === 403) {
-        setError("Please verify your email before logging in.");
+        setModalMessage("Please check your email for a message from CampusMind and verify your email in order to log in.");
         return;
       }
 
       if (!res.ok) {
-        const data = await res.json();
-        setError(data.message || "Login failed.");
-        return;
-      }
+  const data = await res.json();
+  setModalMessage(data.message || "Invalid username or password.");
+  return;
+}
+
 
       // If success
       // const data = await res.json(); // Optionally read backend data
@@ -75,11 +78,18 @@ function Home() {
         <p className={styles.disclaimer}>
           We will not be held accountable for actions you commit based on your conversations with this bot.
         </p>
+        {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
 
       </div> {/* 🧊 END NEW WRAPPER DIV */}
     </div>
+      {modalMessage && (
+        <Modal message={modalMessage} onClose={() => setModalMessage("")} />
+      )}
     </div>
   );
+
+
 }
+
 
 export default Home;
