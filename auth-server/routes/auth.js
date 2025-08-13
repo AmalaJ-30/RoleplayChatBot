@@ -3,9 +3,14 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import { sendVerificationEmail } from '../utils/automated-emails.js';
 import * as crypto from 'crypto';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+import { authMiddleware } from "../middlewarefolder/authMiddleware.js";
+
+
 
 const router = express.Router();
-
+dotenv.config();
 
 //const { sendVerificationEmail } = require('../utils/automated-emails');
 // POST /signup
@@ -107,9 +112,11 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: "We cannot find you in our system, please make sure your username and password are correct" });
     }
-
+    
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    
     // 4️⃣ Success
-    res.json({ message: "Login successful!" });
+    res.json({ message: "Login successful!", token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });

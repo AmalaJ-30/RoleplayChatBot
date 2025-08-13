@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
-
+import chatRoutes from './routes/chat.js';
 
 dotenv.config();
 console.log('POSTMARK_API_KEY:', process.env.POSTMARK_API_KEY);
@@ -12,6 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use('/api/auth', authRoutes);
+app.use('/api/chats', chatRoutes);
 // 1 Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
