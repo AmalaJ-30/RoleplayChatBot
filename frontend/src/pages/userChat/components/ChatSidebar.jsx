@@ -10,11 +10,13 @@ const toggleMenu = (id) => {
 };
 
 const handleRename = (sessionId) => {
+  console.log("The rename train got here, Chatsidebar.jsx line 13");
   const newPerson = prompt("New person name?");
   const newRole = prompt("New role name?");
   if (newPerson && newRole) {
     onRenameChat(sessionId, newPerson, newRole);
   }
+  console.log("[ChatSidebar] Rename clicked:", sessionId, newPerson, newRole);
 };
   return (
     <div className={`${styles.sidebar} ${theme === "dark" ? styles.sidebarDark : styles.sidebarLight}`}>
@@ -33,24 +35,24 @@ const handleRename = (sessionId) => {
       <ul className={styles.chatList}>
       {chats.map((chat) => (
           <li
-            key={chat.session_id}
-            className={`${styles.chatItem} ${chat.session_id === activeChatId ? styles.active : ""}`}
-            onClick={() => onSelectChat(chat.session_id)} 
+            key={chat._id}
+            className={`${styles.chatItem} ${chat._id === activeChatId ? styles.active : ""}`}
+            onClick={() => onSelectChat(chat._id)} 
           >
             {chat.person} as <em>{chat.role}</em>
 
             <div className={styles.menuWrapper}>
           <button
             className={styles.menuButton}
-            onClick={() => toggleMenu(chat.session_id)}
+            onClick={() => toggleMenu(chat._id)}
           >
             ⋯
           </button>
 
-          {openMenuId === chat.session_id && (
+          {openMenuId === chat._id && (
             <div className={styles.dropdown}>
-              <button onClick={() => onDeleteChat(chat.session_id)}> 🚮 Delete</button>
-              <button onClick={() => handleRename(chat.session_id)}> ✒️ Rename</button>
+              <button onClick={(e) => { e.stopPropagation(); onDeleteChat(chat._id)}}> 🚮 Delete</button>
+              <button onClick={(e) => { e.stopPropagation(); handleRename(chat._id)}}> ✒️ Rename</button>
             </div>
           )}
         </div>

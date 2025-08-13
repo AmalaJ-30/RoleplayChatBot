@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import styles from './UserChat.module.css';
 import ChatSidebar from "./components/ChatSidebar";
+import { api } from "../../api";
+
 
 function UserChat() {
   const [theme, setTheme] = useState("Dark");
@@ -20,18 +22,12 @@ function UserChat() {
   }, []);
 
   // 2. Load chatList and activeChatId first
-  useEffect(() => {
+useEffect(() => {
   const fetchChats = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:5000/api/chat", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (!res.ok) throw new Error("Failed to load chats");
-
-      const data = await res.json();
-      setChats(data);
+      const data = await api.get("/chats"); // call helper
+      setChats(data); // this is your chat array
     } catch (err) {
       console.error("Error loading chats:", err);
     }
@@ -39,18 +35,6 @@ function UserChat() {
 
   fetchChats();
 }, []);
-
-
-
-  // 3. Load messages for selected chat
-  useEffect(() => {
-    if (activeChatId) {
-      const savedData = JSON.parse(localStorage.getItem(activeChatId));
-      if (savedData && savedData.messages) {
-        setConversation(savedData.messages);
-      }
-    }
-  }, [activeChatId]);
 
   // 4. Save active chatId
   useEffect(() => {
@@ -80,7 +64,7 @@ function UserChat() {
     const token = localStorage.getItem("token");
 
     // Update backend chat with new message
-    await fetch(`http://localhost:5000/api/chat/${activeChatId}`, {
+    await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -90,11 +74,11 @@ function UserChat() {
     });
 
     // Call AI backend for reply
-    const response = await fetch("http://localhost:8000/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: activeChatId, person, role, message: tempMessage })
-    });
+  const response = await fetch("http://localhost:8000/chat", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ session_id: activeChatId, person, role, message: tempMessage })
+});
 
     const data = await response.json();
     const aiMessage = { sender: "ai", text: data.reply || "[Error: No reply]" };
@@ -103,7 +87,7 @@ function UserChat() {
     setConversation(finalMessages);
 
     // Save final messages to backend
-    await fetch(`http://localhost:5000/api/chat/${activeChatId}`, {
+    await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -118,32 +102,23 @@ function UserChat() {
 };
 
   
-  const handleSelection = async () => {
+const handleSelection = async () => {
   if (person.trim() === "" || role.trim() === "") return;
 
   const newChat = { person, role, messages: [] };
 
   try {
     const token = localStorage.getItem("token");
-    const res = await fetch("http://localhost:5000/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify(newChat)
-    });
+    console.log("[Frontend] Token at chat create:", token);
+    const savedChat = await api.post("/chats", newChat); // use helper
 
-    if (!res.ok) throw new Error("Failed to create chat, userchat.jsx, handle selection");
-
-    const savedChat = await res.json();
     setChats(prev => [...prev, savedChat]);
     setActiveChatId(savedChat._id);
     setConversation([]);
     setSelectionLocked(true);
 
   } catch (err) {
-    console.error("Error creating chat:", err);
+    console.error("Error creating chat (Handle selection UserChat.jsx):", err);
   }
 };
 
@@ -157,44 +132,53 @@ function UserChat() {
     setSelectionLocked(false);
   };
 
-  const handleSelectChat = (id) => {
-    const chat = chats.find(c => c.session_id === id);
-    if (!chat) return;
-  
-    setActiveChatId(chat.session_id);
-    setPerson(chat.person);
-    setRole(chat.role);
-    setConversation(chat.messages || []);
+  const handleSelectChat = async (id) => {
+  try {
+    setActiveChatId(id); // ✅ Use MongoDB _id directly
+
+    const chatData = await api.get(`/chats/${id}`); // GET single chat from backend
+    setPerson(chatData.person);
+    setRole(chatData.role);
+    setConversation(chatData.messages || []);
     setSelectionLocked(true);
-  };
+  } catch (err) {
+    console.error("Error loading chat: (Handle select chat, UserChat.jsx)", err);
+  }
+};
   
-  const handleDeleteChat = (sessionId) => {
-    setChats(prevChats => prevChats.filter(chat => chat.session_id !== sessionId));
-  
-    if (sessionId === activeChatId) {
+ const handleDeleteChat = async (id) => {
+  try {
+    await api.delete(`/chats/${id}`); // delete in MongoDB
+    setChats(prevChats => prevChats.filter(chat => chat._id !== id));
+
+    if (id === activeChatId) {
       setActiveChatId(null);
+      setConversation([]);
     }
+  } catch (err) {
+    console.error("Error deleting chat:", err);
+  }
+};
+
   
-    localStorage.removeItem(sessionId); // removes from everywhere
-  };
-  
-  const handleRenameChat = (sessionId, newPerson, newRole) => {
-    setChats(prevChats =>
-      prevChats.map(chat =>
-        chat.session_id === sessionId
-          ? { ...chat, person: newPerson, role: newRole }
-          : chat
-      )
-    );
-  
-    const chatData = JSON.parse(localStorage.getItem(sessionId));
-    if (chatData) {
-      localStorage.setItem(
-        sessionId,
-        JSON.stringify({ ...chatData, person: newPerson, role: newRole })
-      );
-    }
-  };
+
+const handleRenameChat = async (chatId, newPerson, newRole) => {
+  //console.log("Renaming in UserChat:", chatId, newPerson, newRole);
+  try {
+    const updated = await api.put(`/chats/${chatId}`, {
+      person: newPerson,
+      role: newRole,
+    });
+   setChats(prev =>
+  prev.map(chat =>
+    chat._id === chatId ? { ...chat, person: newPerson, role: newRole } : chat
+  )
+);
+  } catch (err) {
+   // console.error("Error renaming chat:", err);
+  }
+};
+
 
   return (
       <div className={`${styles.pageWrapper} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
