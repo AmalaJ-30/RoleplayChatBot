@@ -12,7 +12,7 @@ function UserChat() {
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [loadedFromStorage, setLoadedFromStorage] = useState(false);
-
+  
   // 1. Set theme first (dark/light)
   useEffect(() => {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -21,26 +21,26 @@ function UserChat() {
 
   // 2. Load chatList and activeChatId first
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("chatList"));
-    console.log("Loaded chatList from localStorage:", saved);
-    if (saved) {
-      const restored = saved.map(chat => {
-        const savedData = JSON.parse(localStorage.getItem(chat.session_id)) || {};
-        return {
-          ...chat,
-          messages: savedData.messages || []
-        };
+  const fetchChats = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:5000/api/chat", {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      setChats(restored);
-    }
 
-    const last = localStorage.getItem("lastActiveChatId");
-    if (last) {
-      setActiveChatId(last);
-    }
+      if (!res.ok) throw new Error("Failed to load chats");
 
-    setLoadedFromStorage(true);
-  }, []);
+      const data = await res.json();
+      setChats(data);
+    } catch (err) {
+      console.error("Error loading chats:", err);
+    }
+  };
+
+  fetchChats();
+}, []);
+
+
 
   // 3. Load messages for selected chat
   useEffect(() => {
@@ -67,73 +67,86 @@ function UserChat() {
   }, [chats, loadedFromStorage]);
 
   const handleSendMessage = async () => {
-    if (!activeChatId || message.trim() === "") return;
+  if (!activeChatId || message.trim() === "") return;
+
+  const tempMessage = message;
+  setMessage("");
+
+  const userMessage = { sender: "user", text: tempMessage };
+  const updatedMessages = [...conversation, userMessage];
+  setConversation(updatedMessages);
+
+  try {
+    const token = localStorage.getItem("token");
+
+    // Update backend chat with new message
+    await fetch(`http://localhost:5000/api/chat/${activeChatId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ messages: updatedMessages })
+    });
+
+    // Call AI backend for reply
+    const response = await fetch("http://localhost:8000/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: activeChatId, person, role, message: tempMessage })
+    });
+
+    const data = await response.json();
+    const aiMessage = { sender: "ai", text: data.reply || "[Error: No reply]" };
+    const finalMessages = [...updatedMessages, aiMessage];
+
+    setConversation(finalMessages);
+
+    // Save final messages to backend
+    await fetch(`http://localhost:5000/api/chat/${activeChatId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ messages: finalMessages })
+    });
+
+  } catch (error) {
+    console.error("Error sending message:", error);
+  }
+};
+
   
-    const tempMessage = message;
-    setMessage("");
-  
-    // Optimistically show user message
-    const userMessage = { sender: "user", text: tempMessage };
-    setConversation(prev => [...prev, userMessage]);
-  
-    try {
-      const response = await fetch("http://localhost:8000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          session_id: activeChatId,
-          person,
-          role,
-          message: tempMessage,
-        }),
-      });
-  
-      const data = await response.json();
-  
-      const aiMessage = { sender: "ai", text: data.reply || "[Error: No reply]" };
-      const updatedMessages = [...conversation, userMessage, aiMessage];
-  
-      setConversation(updatedMessages);
-  
-      setChats(prev =>
-        prev.map(chat =>
-          chat.session_id === activeChatId
-            ? { ...chat, messages: updatedMessages, person, role }
-            : chat
-        )
-      );
-  
-      console.log("Sending to backend:", {
-        session_id: activeChatId,
-        person,
-        role,
-        message: tempMessage,
-      });
-  
-    } catch (error) {
-      console.error("Error talking to backend:", error);
-      setConversation(prev => [...prev, { sender: "ai", text: "[Error: Connection failed]" }]);
-    }
-  };
-  
-  const handleSelection = () => {
-    if (person.trim() === "" || role.trim() === "") return;
-  
-    const newId = crypto.randomUUID();
-  
-    const newChat = {
-      session_id: newId,
-      person,
-      role,
-      messages: [],
-    };
-  
-    setChats(prev => [...prev, newChat]);
-    setActiveChatId(newId);
+  const handleSelection = async () => {
+  if (person.trim() === "" || role.trim() === "") return;
+
+  const newChat = { person, role, messages: [] };
+
+  try {
+    const token = localStorage.getItem("token");
+    const res = await fetch("http://localhost:5000/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(newChat)
+    });
+
+    if (!res.ok) throw new Error("Failed to create chat, userchat.jsx, handle selection");
+
+    const savedChat = await res.json();
+    setChats(prev => [...prev, savedChat]);
+    setActiveChatId(savedChat._id);
     setConversation([]);
-    setMessage("");
     setSelectionLocked(true);
-  };
+
+  } catch (err) {
+    console.error("Error creating chat:", err);
+  }
+};
+
   
   const handleStartNewChat = () => {
     // Just reset the state and unlock input — no chat is created yet

@@ -33,9 +33,9 @@ function Home() {
 }
 
 
-      // If success
-      // const data = await res.json(); // Optionally read backend data
-      navigate("/userChat");
+        const data = await res.json();
+    localStorage.setItem("token", data.token);
+    navigate("/userChat");
 
     } catch (err) {
       console.error(err);
