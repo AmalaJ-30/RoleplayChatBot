@@ -23,3 +23,23 @@ export async function sendVerificationEmail(to, token) {
     TextBody: `Visit this link to verify your account: ${verifyUrl}`
   });
 }
+
+export async function sendPasswordResetEmail(to, token) {
+  const resetUrl = `${FRONTEND_URL}/reset-password?token=${encodeURIComponent(token)}`;
+
+  const htmlBody = `
+    <h2>Reset Your Password</h2>
+    <p>Click the link below to reset your password:</p>
+    <p>Please note that this link expires after 15 minutes</p>
+    <a href="${resetUrl}">${resetUrl}</a>
+    <p>If you did not request this, you can ignore this email.</p>
+  `;
+
+  await client.sendEmail({
+    From: process.env.POSTMARK_SENDER,
+    To: to,
+    Subject: "Reset your CampusMind password",
+    HtmlBody: htmlBody,
+    TextBody: `Visit this link to reset your password: ${resetUrl}`
+  });
+}

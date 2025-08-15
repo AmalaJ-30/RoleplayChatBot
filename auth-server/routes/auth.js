@@ -1,11 +1,12 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
-import { sendVerificationEmail } from '../utils/automated-emails.js';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/automated-emails.js';
 import * as crypto from 'crypto';
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { authMiddleware } from "../middlewarefolder/authMiddleware.js";
+//import { sendPasswordResetEmail } from "../utils/automatedEmails.js";
 
 
 
@@ -26,6 +27,12 @@ router.post('/signup', async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: 'Email or Username already taken' });
     }
+
+      /*const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
+  if (!strongPassword.test(password)) {
+    return res.status(400).json({ message: "Password must be at least 8 characters, include a number and a symbol." });
+  }*/
+
 
     // 2️⃣ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -122,5 +129,61 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+router.post("/forgot-password", async (req, res) => {
+  const { usernameOrEmail } = req.body;
+  if (!usernameOrEmail) return res.status(400).json({ message: "Username or email required" });
+
+  const user = await User.findOne({ 
+    $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }] 
+  });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  // Generate token & expiry
+  const token = crypto.randomBytes(32).toString("hex");
+  user.resetPasswordToken = token;
+  user.resetPasswordExpires = Date.now() + 1000 * 60 * 15; // 15 minutes
+  await user.save();
+
+  // Send email
+  await sendPasswordResetEmail(user.email, token);
+
+  res.json({ message: "Password reset email sent" });
+});
+
+router.put("/reset-password", async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) {
+    return res.status(400).json({ message: "Token and password are required" });
+  }
+
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() } // token still valid
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Invalid or expired token" });
+  }
+
+  // Strong password check
+  const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
+  if (!strongPassword.test(password)) {
+    return res.status(400).json({ message: "Password must be at least 8 characters, include a number and a symbol." });
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(password, 10);
+  user.password = hashedPassword;
+
+  // Clear reset fields
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+
+  await user.save();
+
+  res.json({ message: "Password reset successful" });
+});
+
 
 export default router;

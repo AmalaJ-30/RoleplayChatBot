@@ -3,6 +3,7 @@ import Home from "./pages/signup/home.jsx"; // ⬅️ updated path
 import Signup from "./pages/signup/signup.jsx";
 import UserChat from "./pages/userChat/UserChat.jsx";
 import SignupEmailVerification from "./pages/signup/SignupEmailVerification.jsx";
+import ResetPassword from "./pages/signup/resetpasswordpage.jsx";
 function App() {
   return (
     <Routes>
@@ -10,6 +11,8 @@ function App() {
       <Route path="/signup" element={<Signup />} />
       <Route path="/signup/verify" element={<SignupEmailVerification />} />
       <Route path="/userChat" element={<UserChat />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
     </Routes>
   );
 }
