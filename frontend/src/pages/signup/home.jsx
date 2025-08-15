@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./home.module.css";
-import Modal from "../../components/Modal.jsx"; 
+import Modal from "../../components/Modal.jsx";
+import { api } from "../../api.js";
 
 function Home() {
   const navigate = useNavigate();
@@ -43,6 +44,23 @@ function Home() {
     }
   };
 
+ const handleForgotPassword = async () => {
+  if (!username) {
+    alert("Please enter your username or email first.");
+    return;
+  }
+
+  try {
+    const res = await api.post('/auth/forgot-password', { usernameOrEmail: username });
+    alert(res.message || "Password reset email sent.");
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    alert(err.message || "Something went wrong. Please try again.");
+
+  }
+};
+
+
   return (
     <div className={styles.pageWrapper}>
     <div className={styles.homeContainer}>
@@ -70,6 +88,13 @@ function Home() {
 />
           <button className={styles.loginButton} onClick={handleLogin}>Login</button>
         </div>
+
+        <p 
+  style={{ cursor: 'pointer', marginTop: '10px', color: '#9b5de5' }} 
+  onClick={handleForgotPassword}
+>
+  Forgot Password?
+</p>
 
         <p className={styles.warningText}>
           Please note that the conversations you are about to have are with AI bots. <br />

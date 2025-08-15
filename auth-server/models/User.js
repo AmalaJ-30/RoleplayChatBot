@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true }, // will be hashed
   verified: { type: Boolean, default: false },      // <-- NEW
-  verificationToken: { type: String }
+  verificationToken: { type: String },
+  resetPasswordToken: String,
+resetPasswordExpires: Date
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);
