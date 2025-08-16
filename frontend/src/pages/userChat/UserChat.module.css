@@ -174,3 +174,37 @@ body {
 .sendButton:hover {
   background: #a314dc;
 }
+
+.personInputWrapper {
+  position: relative;   /* so dropdown can be positioned relative to input */
+  display: inline-block;
+  width: 100%;
+  max-width: 300px;
+}
+
+.personSuggestions {
+  position: absolute;
+top: 100%;   /* directly below input */
+  left: 0;
+  width: 100%; /* match input width */
+  right: 0;
+  background: #1f1b3a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  list-style: none;
+  padding: 0;
+  margin: 5px 0 0 0;
+  z-index: 1000;
+}
+
+.personSuggestions li {
+  padding: 10px;
+  cursor: pointer;
+  color: white;
+}
+
+.personSuggestions li:hover {
+  background: #2b274b;
+}
