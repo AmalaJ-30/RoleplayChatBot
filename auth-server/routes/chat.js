@@ -1,7 +1,17 @@
 import express from "express";
 import { authMiddleware } from "../middlewarefolder/authMiddleware.js";
 import Chat from "../models/chatSchema.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename =fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Read famousPeople.json manually import famousPeople from "../famousPeople.json" assert { type: "json" }; did not work
+const famousPeople = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "../famousPeople.json"), "utf-8")
+);
 const router = express.Router();
 
 /*router.put(
@@ -44,6 +54,16 @@ router.get("/", authMiddleware, async (req, res) => {
 // Save a new chat
 router.post("/", authMiddleware, async (req, res) => {
   try {
+
+     // Check if person is in famous people list (case insensitive)
+     const { person, role, messages } = req.body;
+  const isFamous = famousPeople.some(
+    (name) => name.toLowerCase() === person.trim().toLowerCase()
+  );
+
+  if (!isFamous) {
+    return res.status(400).json({ message: "This person is not in the famous people list." });
+  } 
     const chat = new Chat({
       userId: req.user.id,
       person: req.body.person,
@@ -57,6 +77,10 @@ router.post("/", authMiddleware, async (req, res) => {
     console.error("Error creating chat:", err);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+router.get("/famous-people", (req, res) => {
+  res.json(famousPeopleArray); // send the array from famousPeople.json
 });
 
 // Update messages for a specific chat

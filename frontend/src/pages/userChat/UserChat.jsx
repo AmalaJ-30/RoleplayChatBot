@@ -14,6 +14,8 @@ function UserChat() {
   const [chats, setChats] = useState([]);
   const [activeChatId, setActiveChatId] = useState(null);
   const [loadedFromStorage, setLoadedFromStorage] = useState(false);
+  const [famousPeople, setFamousPeople] = useState([]);
+  const [suggestions, setSuggestions] = useState([]);
   
   // 1. Set theme first (dark/light)
   useEffect(() => {
@@ -22,6 +24,51 @@ function UserChat() {
   }, []);
 
   // 2. Load chatList and activeChatId first
+  /*useEffect(() => {
+  const fetchFamousPeople = async () => {
+    try {
+      const list = await api.get("/chats/famous-people");
+      setFamousPeople(list);
+    } catch (err) {
+      console.error("Error loading famous people:", err);
+    }
+  };
+
+  fetchFamousPeople();
+}, []);*/
+
+/*useEffect(() => {
+  api.get("/famous-people").then(setFamousPeople).catch(console.error);
+}, []); */
+
+const handlePersonChange = (e) => {
+  const value = e.target.value;
+  setPerson(value);
+
+  if (value.trim().length === 0) {
+    setSuggestions([]);
+    return;
+  }
+
+  const filtered = famousPeople.filter(name =>
+    name.toLowerCase().includes(value.toLowerCase())
+  );
+  setSuggestions(filtered);
+};
+
+useEffect(() => {
+  api.get("/famous-people")
+    .then((data) => {
+      console.log("✅ Famous people loaded:", data);
+      console.log("✅ Number of names:", data.length);
+      setFamousPeople(data);
+    })
+    .catch((err) => {
+      console.error("❌ Failed to load famous people:", err);
+    });
+}, []);
+
+
 useEffect(() => {
   const fetchChats = async () => {
     try {
@@ -104,6 +151,15 @@ useEffect(() => {
   
 const handleSelection = async () => {
   if (person.trim() === "" || role.trim() === "") return;
+
+  const isFamous = famousPeople.some(
+    (name) => name.toLowerCase() === person.trim().toLowerCase()
+  );
+
+  if (!isFamous) {
+    alert("Oops, not famous enough for me to know 'em. Try someone that's actually important 😉");
+    return;
+  }
 
   const newChat = { person, role, messages: [] };
 
@@ -207,13 +263,31 @@ const handleRenameChat = async (chatId, newPerson, newRole) => {
 
 {!selectionLocked && (
   <div className={styles.selectionBox}>
-    <input
-      type="text"
-      placeholder="Enter a famous person"
-      value={person}
-      onChange={(e) => setPerson(e.target.value)}
-      className={styles.chatboxInput}
-    />
+<div className={styles.personInputWrapper}>
+ <input
+  type="text"
+  value={person}
+  onChange={handlePersonChange}
+  placeholder="Enter a famous person"
+  className={styles.chatboxInput}
+/>
+
+
+  {suggestions.length > 0 && (
+    <ul className={styles.personSuggestions}>
+      {suggestions.map((name, i) => (
+        <li key={i} onClick={() => {
+          setPerson(name);
+          setSuggestions([]);
+        }}>
+          {name}
+        </li>
+      ))}
+    </ul>
+  )}
+</div>
+
+
     <input
       type="text"
       placeholder="Enter their role"
