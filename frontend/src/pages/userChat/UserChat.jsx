@@ -152,31 +152,49 @@ useEffect(() => {
 const handleSelection = async () => {
   if (person.trim() === "" || role.trim() === "") return;
 
-  const isFamous = famousPeople.some(
-    (name) => name.toLowerCase() === person.trim().toLowerCase()
+  // ✅ Normalize input
+  const input = person.trim().toLowerCase();
+
+  // ✅ First check direct match
+  let resolvedName = famousPeople.find(
+    (name) => name.toLowerCase() === input
   );
 
-  if (!isFamous) {
+  // ✅ If no direct match, check aliases
+  if (!resolvedName && window.aliases) {
+    for (const [canonical, aliasList] of Object.entries(window.aliases)) {
+      if (
+        aliasList.some((alias) => alias.toLowerCase() === input) ||
+        canonical.toLowerCase() === input
+      ) {
+        resolvedName = canonical; // always use the "real" name
+        break;
+      }
+    }
+  }
+
+  if (!resolvedName) {
     alert("Oops, not famous enough for me to know 'em. Try someone that's actually important 😉");
     return;
   }
 
-  const newChat = { person, role, messages: [] };
+  // ✅ Use resolved name when creating chat
+  const newChat = { person: resolvedName, role, messages: [] };
 
   try {
     const token = localStorage.getItem("token");
     console.log("[Frontend] Token at chat create:", token);
-    const savedChat = await api.post("/chats", newChat); // use helper
+    const savedChat = await api.post("/chats", newChat);
 
-    setChats(prev => [...prev, savedChat]);
+    setChats((prev) => [...prev, savedChat]);
     setActiveChatId(savedChat._id);
     setConversation([]);
     setSelectionLocked(true);
-
   } catch (err) {
     console.error("Error creating chat (Handle selection UserChat.jsx):", err);
   }
 };
+
 
   
   const handleStartNewChat = () => {
@@ -235,6 +253,31 @@ const handleRenameChat = async (chatId, newPerson, newRole) => {
   }
 };
 
+const roles = [
+  "Mom",
+  "Dad",
+  "Teacher",
+  "Therapist",
+  "Dog 🐶",
+  "Cat 🐱",
+  "Brother",
+  "Sister",
+  "Grandma",
+  "Grandpa",
+  "Boss",
+  "Best Friend",
+  "Roommate",
+  "Coach",
+  "Neighbor",
+  "Celebrity Impersonator",
+  "Santa 🎅",
+  "Pirate 🏴‍☠️",
+  "Detective",
+  "Villain",
+  "Superhero"
+];
+
+
 
   return (
       <div className={`${styles.pageWrapper} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
@@ -288,13 +331,17 @@ const handleRenameChat = async (chatId, newPerson, newRole) => {
 </div>
 
 
-    <input
-      type="text"
-      placeholder="Enter their role"
-      value={role}
-      onChange={(e) => setRole(e.target.value)}
-      className={styles.chatboxInput}
-    />
+    <select
+  value={role}
+  onChange={(e) => setRole(e.target.value)}
+  className={styles.chatboxInput}
+>
+  <option value="">-- Select a role --</option>
+  {roles.map((r, i) => (
+    <option key={i} value={r}>{r}</option>
+  ))}
+</select>
+
     <button onClick={handleSelection} className={styles.sendButton}>
       Start Chat
     </button>

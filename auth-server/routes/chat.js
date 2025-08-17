@@ -8,6 +8,33 @@ import { fileURLToPath } from "url";
 const __filename =fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Aliases
+const aliasesPath = path.join(__dirname, "../aliases.json");
+const aliases = JSON.parse(fs.readFileSync(aliasesPath, "utf-8"));
+
+// Flatten alias map for quick lookup
+function resolveAlias(inputName) {
+  const lowerInput = inputName.trim().toLowerCase();
+
+  // 1. Direct famous person match
+  if (famousPeople.some(name => name.toLowerCase() === lowerInput)) {
+    return inputName;
+  }
+
+  // 2. Alias match → return canonical name
+  for (const [canonical, aliasList] of Object.entries(aliases)) {
+    if (
+      aliasList.some(alias => alias.toLowerCase() === lowerInput) ||
+      canonical.toLowerCase() === lowerInput
+    ) {
+      return canonical; // always return the "real" name
+    }
+  }
+
+  return null; // not found
+}
+
+
 // Read famousPeople.json manually import famousPeople from "../famousPeople.json" assert { type: "json" }; did not work
 const famousPeople = JSON.parse(
   fs.readFileSync(path.join(__dirname, "../famousPeople.json"), "utf-8")
@@ -57,6 +84,14 @@ router.post("/", authMiddleware, async (req, res) => {
 
      // Check if person is in famous people list (case insensitive)
      const { person, role, messages } = req.body;
+     
+    const resolvedName = resolveAlias(person);
+
+    if (!resolvedName) {
+      return res.status(400).json({
+        message: "Oops, not famous enough for me to know 'em. Try someone actually important 😉",
+      });
+    }
   const isFamous = famousPeople.some(
     (name) => name.toLowerCase() === person.trim().toLowerCase()
   );
@@ -66,7 +101,7 @@ router.post("/", authMiddleware, async (req, res) => {
   } 
     const chat = new Chat({
       userId: req.user.id,
-      person: req.body.person,
+      person: resolvedName,
       role: req.body.role,
       messages: req.body.messages || [],
     });
@@ -78,6 +113,36 @@ router.post("/", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+/*
+router.post("/", authMiddleware, async (req, res) => {
+  try {
+    const { person, role, messages } = req.body;
+
+    const resolvedName = resolveAlias(person);
+
+    if (!resolvedName) {
+      return res.status(400).json({
+        message: "Oops, not famous enough for me to know 'em. Try someone actually important 😉",
+      });
+    }
+
+    const chat = new Chat({
+      userId: req.user.id,
+      person: resolvedName,  // ✅ Always save canonical name
+      role,
+      messages: messages || [],
+    });
+
+    const savedChat = await chat.save();
+    res.json(savedChat);
+  } catch (err) {
+    console.error("Error creating chat:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+*/
 
 router.get("/famous-people", (req, res) => {
   res.json(famousPeopleArray); // send the array from famousPeople.json

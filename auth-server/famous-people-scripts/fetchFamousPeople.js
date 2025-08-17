@@ -55,7 +55,9 @@ const categories = [
   "Category:Presidents_of_the_United_States",
   "Category:Hollywood_actors",
   "Category:Nobel_laureates_in_Physics",
-  "Category:Famous_musicians"
+  "Category:Rappers",
+  "Category:Pop_singers",
+  "Category:Professional_wrestlers",
 ];
 
 async function fetchCategory(title) {
@@ -83,18 +85,21 @@ async function fetchCategory(title) {
 
 async function main() {
   try {
-    let allPeople = new Set();
+    let allPeople = [];
 
     for (const category of categories) {
-      const names = await fetchCategory(category);
-      names.forEach((name) => allPeople.add(name));
+      console.log(`Fetching ${category}...`);
+      const people = await fetchCategory(category);
+      console.log(`✅ Found ${people.length} in ${category}`);
+      allPeople = allPeople.concat(people);
     }
 
-    const famousPeopleList = Array.from(allPeople).sort();
+    // Deduplicate
+    const uniquePeople = [...new Set(allPeople)];
 
-    // Save to JSON
-    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(famousPeopleList, null, 2));
-    console.log(`💾 Saved ${famousPeopleList.length} names to famousPeople.json`);
+    // Save to file
+    fs.writeFileSync(OUTPUT_FILE, JSON.stringify(uniquePeople, null, 2));
+    console.log(`💾 Saved ${uniquePeople.length} names to famousPeople.json`);
   } catch (err) {
     console.error("❌ Error fetching famous people:", err);
   }
