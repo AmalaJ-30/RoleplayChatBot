@@ -1,10 +1,13 @@
 import requests
-import base64
+#import base64
 from PIL import Image
-import io
-import re 
+#import io
+import re
+import os
+from dotenv import load_dotenv
+load_dotenv() 
 
-API_KEY = "sk-aWbBR8gr6GfbVJbW8f91E4E5Ba5d4027A3Dd315f570876D5"
+API_KEY = os.getenv("SORA_API_KEY")
 API_URL = "https://api.laozhang.ai/v1/chat/completions"
 
 def generate_image(prompt):
