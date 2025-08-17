@@ -11,6 +11,9 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import os
+from dotenv import load_dotenv
+load_dotenv() 
 
 app = FastAPI()
 
@@ -24,7 +27,7 @@ app.add_middleware(
 )
 
 os.environ["LANGCHAIN_TRACKING_V2"] = "true"
-os.environ["OPENAI_API_KEY"] = "sk-_d9LhKLJqxPn7NRVyLIaHdLz-SPym78EU3bbyoF_3ZT3BlbkFJPMEVpxHLNeJ__88VWhgNceFipHzM7TkF80lhAsf8QA"
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 model = ChatOpenAI(model="gpt-3.5-turbo")
 store = {}
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
