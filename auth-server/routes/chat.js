@@ -4,6 +4,7 @@ import Chat from "../models/chatSchema.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import fetch from "node-fetch";
 
 const __filename =fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -192,6 +193,22 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", authMiddleware, async (req, res) => {
 //  console.log("[Backend] Rename route hit:", req.params.id, req.body);
   try {
+
+    // Check famous person validity
+const resolvedName = resolveAlias(req.body.person);
+if (!resolvedName) {
+  return res.status(400).json({
+    message: "Oops, not famous enough for me to know 'em. Try someone actually important 😉",
+  });
+}
+
+const isFamous = famousPeople.some(
+  (name) => name.toLowerCase() === req.body.person.trim().toLowerCase()
+);
+if (!isFamous) {
+  return res.status(400).json({ message: "This person is not in the famous people list." });
+}
+
     const updatedChat = await Chat.findOneAndUpdate(
       
       { _id: req.params.id, userId: req.user.id },
@@ -211,5 +228,85 @@ router.put("/:id", authMiddleware, async (req, res) => {
   }
 });
 
+/*router.post("/:id/image", async (req, res) => {
+  try {
+    const { chatId, person, role } = req.body;
+
+    // 1. Check chat
+    let chat = await Chat.findById(chatId);
+    if (!chat) return res.status(404).json({ error: "Chat not found" });
+
+    // 2. Return cached image if exists
+    if (chat.image_url) {
+      return res.json({ image_url: chat.image_url });
+    }
+
+    // 3. Otherwise call FastAPI image generator
+    const response = await fetch("http://localhost:8001/image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: chatId, person, role })
+    });
+
+    const data = await response.json();
+
+    if (!data.image_url) {
+      return res.status(500).json({ error: "Image generation failed" });
+    }
+
+    // 4. Save in DB
+    chat.image_url = data.image_url;
+    await chat.save();
+
+    // 5. Return new image URL
+    res.json({ image_url: chat.image_url });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+*/
+
+router.post("/:id/image", async (req, res) => {
+  try {
+    const { person, role } = req.body;
+    const { id } = req.params;   // ✅ get chatId from the URL
+
+    // 1. Check chat
+    let chat = await Chat.findById(id);
+    if (!chat) return res.status(404).json({ error: "Chat not found" });
+
+    // 2. Return cached image if exists
+    if (chat.image_url) {
+      return res.json({ image_url: chat.image_url });
+    }
+
+    // 3. Otherwise call FastAPI image generator
+    const response = await fetch("http://localhost:8000/image", {  // ✅ your FastAPI port is 8000, not 8001
+      method: "POST",
+      headers: { "Content-Type": "application/json"
+       },
+      body: JSON.stringify({ session_id: id, person, role })
+    });
+
+    const data = await response.json();
+
+    if (!data.image_url) {
+      return res.status(500).json({ error: "Image generation failed" });
+    }
+
+    // 4. Save in DB
+    chat.image_url = data.image_url;
+    await chat.save();
+
+    // 5. Return new image URL
+    res.json({ image_url: chat.image_url });
+
+  } catch (err) {
+    console.error("Error in /:id/image route:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 export default router;

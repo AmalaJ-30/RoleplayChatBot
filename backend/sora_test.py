@@ -54,4 +54,4 @@ def generate_image(prompt):
     return image_url
 
 # Test run
-generate_image("George Washington dressed as a pirate, cinematic, photorealistic, detailed")
+generate_image("George Washington dressed as a dog, cinematic, photorealistic, detailed")

@@ -16,6 +16,10 @@ function UserChat() {
   const [loadedFromStorage, setLoadedFromStorage] = useState(false);
   const [famousPeople, setFamousPeople] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+  //const [chatImage, setChatImage] = useState(null);
+  const [backgroundImage, setBackgroundImage] = useState(null);
+
+
   
   // 1. Set theme first (dark/light)
   useEffect(() => {
@@ -188,6 +192,14 @@ const handleSelection = async () => {
 
     setChats((prev) => [...prev, savedChat]);
     setActiveChatId(savedChat._id);
+
+    // Fetch background image
+const imgResponse = await api.post(`/chats/${savedChat._id}/image`, {
+  person: resolvedName,
+  role,
+});
+setBackgroundImage(imgResponse.image_url);
+
     setConversation([]);
     setSelectionLocked(true);
   } catch (err) {
@@ -215,6 +227,19 @@ const handleSelection = async () => {
     setRole(chatData.role);
     setConversation(chatData.messages || []);
     setSelectionLocked(true);
+    setBackgroundImage(chatData.image_url);
+
+    // Load background image if it exists
+ if (chatData.image_url) {
+      setBackgroundImage(chatData.image_url);
+    } else {
+      const imgResponse = await api.post(`/chats/${id}/image`, {
+        person: chatData.person,
+        role: chatData.role,
+      });
+      setBackgroundImage(imgResponse.image_url);
+    }
+
   } catch (err) {
     console.error("Error loading chat: (Handle select chat, UserChat.jsx)", err);
   }
@@ -248,10 +273,20 @@ const handleRenameChat = async (chatId, newPerson, newRole) => {
     chat._id === chatId ? { ...chat, person: newPerson, role: newRole } : chat
   )
 );
+// Regenerate background if renaming the active chat
+if (chatId === activeChatId) {
+  const imgResponse = await api.post(`/chats/${chatId}/image`, {
+    person: newPerson,
+    role: newRole,
+  });
+  setBackgroundImage(imgResponse.image_url);
+}
   } catch (err) {
    // console.error("Error renaming chat:", err);
   }
 };
+
+
 
 const roles = [
   "Mom",
@@ -295,7 +330,10 @@ const roles = [
         />
   
  {/* Main Chat Area */}
-<div className={`${styles.userchatContainer} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
+<div
+  className={`${styles.userchatContainer} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}
+>
+
 
 <button
   className={styles.themeToggle}
@@ -348,7 +386,15 @@ const roles = [
   </div>
 )}
 
-<div className={styles.chatMain}>
+<div 
+  className={styles.chatMain}
+  style={{
+    backgroundImage: backgroundImage ? `url(${backgroundImage})` : "none",
+    backgroundSize: "contain",   // ✅ fit whole image
+    backgroundPosition: "top center",  // ✅ show head
+    backgroundRepeat: "no-repeat",
+  }}
+>
   <div className={styles.chatbox}>
     {conversation.map((msg, index) => (
       <div key={index} className={`${styles.chatBubble} ${styles[msg.sender]}`}>
@@ -356,6 +402,7 @@ const roles = [
       </div>
     ))}
   </div>
+
 
   <div className={styles.messageInput}>
   <div className={styles.inputWrapper}>
