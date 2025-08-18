@@ -13,18 +13,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
+from fastapi import APIRouter
+from pydantic import BaseModel
 load_dotenv() 
 
-app = FastAPI()
 
-# Allow frontend to talk to backend (CORS)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # You can tighten this later
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+router = APIRouter()
+
 
 os.environ["LANGCHAIN_TRACKING_V2"] = "true"
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
@@ -44,7 +39,7 @@ class ChatRequest(BaseModel):
     role: str
     message: str
 print("Start chat")
-@app.post("/chat")
+@router.post("/chat")
 async def chat_endpoint(request: ChatRequest):
     config = {"configurable": {"session_id": request.session_id}}
 
