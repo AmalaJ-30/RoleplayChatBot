@@ -1,12 +1,12 @@
 {
-  "The Rock": "Dwayne Johnson",
-  "Nicki Minaj": "Onika Tanya Maraj",
-  "Eminem": "Marshall Bruce Mathers III",
-  "Lady Gaga": "Stefani Joanne Angelina Germanotta",
-  "50 Cent": "Curtis James Jackson III",
-  "Snoop Dogg": "Calvin Cordozar Broadus Jr.",
-  "Ice Cube": "O'Shea Jackson",
-  "Dr. Dre": "Andre Romelle Young",
-  "Jay-Z": "Shawn Corey Carter",
-  "Adele": "Adele Laurie Blue Adkins"
+  "Dwayne Johnson": ["The Rock"],
+  "Onika Tanya Maraj": ["Nicki Minaj"],
+  "Marshall Bruce Mathers III": ["Eminem"],
+  "Stefani Joanne Angelina Germanotta": ["Lady Gaga"],
+  "Curtis James Jackson III": ["50 Cent"],
+  "Calvin Cordozar Broadus Jr.": ["Snoop Dogg"],
+  "O'Shea Jackson": ["Ice Cube"],
+  "Andre Romelle Young": ["Dr. Dre"],
+  "Shawn Corey Carter": ["Jay-Z"],
+  "Adele Laurie Blue Adkins": ["Adele"]
 }

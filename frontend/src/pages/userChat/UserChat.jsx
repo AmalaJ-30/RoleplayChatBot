@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from './UserChat.module.css';
 import ChatSidebar from "./components/ChatSidebar";
 import { api } from "../../api";
+import PersonRolePicker from "./components/PersonRolePicker.jsx";
 
 
 function UserChat() {
@@ -115,7 +116,8 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     // Update backend chat with new message
-    await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
+    await fetch(`http://localhost:5000/api/chats/${activeChatId}/messages`, {
+    //await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -125,7 +127,7 @@ useEffect(() => {
     });
 
     // Call AI backend for reply
-  const response = await fetch("http://localhost:8000/chat", {
+  const response = await fetch("http://localhost:8001/chat", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ session_id: activeChatId, person, role, message: tempMessage })
@@ -137,8 +139,9 @@ useEffect(() => {
 
     setConversation(finalMessages);
 
-    // Save final messages to backend
-    await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
+    // Save final messages to 
+    await fetch(`http://localhost:5000/api/chats/${activeChatId}/messages`, {
+    //await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -198,6 +201,7 @@ const imgResponse = await api.post(`/chats/${savedChat._id}/image`, {
   person: resolvedName,
   role,
 });
+console.log("🖼️ Image response handle selection:", imgResponse);
 setBackgroundImage(imgResponse.image_url);
 
     setConversation([]);
@@ -220,23 +224,30 @@ setBackgroundImage(imgResponse.image_url);
 
   const handleSelectChat = async (id) => {
   try {
-    setActiveChatId(id); // ✅ Use MongoDB _id directly
+    setActiveChatId(id);
 
-    const chatData = await api.get(`/chats/${id}`); // GET single chat from backend
+    // 🧹 Clear old background while loading new one
+    setBackgroundImage(null);
+
+    const chatData = await api.get(`/chats/${id}`);
     setPerson(chatData.person);
     setRole(chatData.role);
     setConversation(chatData.messages || []);
     setSelectionLocked(true);
-    setBackgroundImage(chatData.image_url);
 
-    // Load background image if it exists
- if (chatData.image_url) {
+    if (chatData.image_url) {
+      // ✅ Use saved image
+      console.log("🖼️ Using saved image:", chatData.image_url);
       setBackgroundImage(chatData.image_url);
     } else {
+      // ✅ Generate and save new one
       const imgResponse = await api.post(`/chats/${id}/image`, {
+        session_id: id,
         person: chatData.person,
         role: chatData.role,
       });
+
+      console.log("🖼️ Generated new image:", imgResponse);
       setBackgroundImage(imgResponse.image_url);
     }
 
@@ -244,6 +255,8 @@ setBackgroundImage(imgResponse.image_url);
     console.error("Error loading chat: (Handle select chat, UserChat.jsx)", err);
   }
 };
+
+
   
  const handleDeleteChat = async (id) => {
   try {
@@ -262,29 +275,57 @@ setBackgroundImage(imgResponse.image_url);
   
 
 const handleRenameChat = async (chatId, newPerson, newRole) => {
-  //console.log("Renaming in UserChat:", chatId, newPerson, newRole);
   try {
-    const updated = await api.put(`/chats/${chatId}`, {
-      person: newPerson,
+    // Normalize input like in handleSelection
+    const input = newPerson.trim().toLowerCase();
+
+    let resolvedName = famousPeople.find(
+      (name) => name.toLowerCase() === input
+    );
+
+    if (!resolvedName && window.aliases) {
+      for (const [canonical, aliasList] of Object.entries(window.aliases)) {
+        if (
+          aliasList.some((alias) => alias.toLowerCase() === input) ||
+          canonical.toLowerCase() === input
+        ) {
+          resolvedName = canonical;
+          break;
+        }
+      }
+    }
+
+    if (!resolvedName) {
+      alert("Oops, not famous enough for me to know 'em.");
+      return;
+    }
+
+    // ✅ Send canonical name to backend
+    const updated = await api.put(`/chats/${chatId}/rename`, {
+      person: resolvedName,
       role: newRole,
     });
-   setChats(prev =>
-  prev.map(chat =>
-    chat._id === chatId ? { ...chat, person: newPerson, role: newRole } : chat
-  )
-);
-// Regenerate background if renaming the active chat
-if (chatId === activeChatId) {
-  const imgResponse = await api.post(`/chats/${chatId}/image`, {
-    person: newPerson,
-    role: newRole,
-  });
-  setBackgroundImage(imgResponse.image_url);
-}
+
+    setChats((prev) =>
+      prev.map((chat) =>
+        chat._id === chatId ? { ...chat, person: resolvedName, role: newRole } : chat
+      )
+    );
+
+    if (chatId === activeChatId) {
+      const imgResponse = await api.post(`/chats/${chatId}/image`, {
+         session_id: chatId,  
+        person: resolvedName,
+        role: newRole,
+         forceRegenerate: true, 
+      });
+      setBackgroundImage(imgResponse.image_url);
+    }
   } catch (err) {
-   // console.error("Error renaming chat:", err);
+    console.error("Error renaming chat:", err);
   }
 };
+
 
 
 
@@ -327,6 +368,8 @@ const roles = [
           onDeleteChat={handleDeleteChat}
           onRenameChat={handleRenameChat}
           theme={theme}
+           famousPeople={famousPeople}   // ✅ pass list
+  roles={roles}      
         />
   
  {/* Main Chat Area */}

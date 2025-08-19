@@ -150,14 +150,14 @@ router.get("/famous-people", (req, res) => {
 });
 
 // Update messages for a specific chat
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id/messages", authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { messages } = req.body;
 
   try {
     const chat = await Chat.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { messages },
+      { $set: { messages } }, //never change this, this is why your images stay
       { new: true }
     );
 
@@ -190,7 +190,7 @@ router.delete("/:id", async (req, res) => {
   }
 });
 //rename
-router.put("/:id", authMiddleware, async (req, res) => {
+router.put("/:id/rename", authMiddleware, async (req, res) => {
 //  console.log("[Backend] Rename route hit:", req.params.id, req.body);
   try {
 
@@ -268,25 +268,70 @@ if (!isFamous) {
 });
 */
 
-router.post("/:id/image", async (req, res) => {
+router.post("/:id/image", authMiddleware, async (req, res) => {
   try {
     const { person, role } = req.body;
-    const { id } = req.params;   // ✅ get chatId from the URL
+    const { id } = req.params;
 
-    // 1. Check chat
-    let chat = await Chat.findById(id);
+    console.log("🎯 Image gen request:", { id, person, role, user: req.user });
+
+    // 1. Find chat with correct user
+    let chat = await Chat.findOne({ _id: id, userId: req.user.id });
+    if (!chat) {
+      console.log("❌ Chat not found in DB:", id, "for user:", req.user.id);
+      return res.status(404).json({ error: "Chat not found" });
+    }
+    console.log("✅ Found chat:", chat._id, "existing image:", chat.image_url);
+
+    // 2. Return cached
+    if (chat.image_url && !req.body.forceRegenerate) {
+      console.log("📦 Returning cached image:", chat.image_url.substring(0,50));
+      return res.json({ image_url: chat.image_url });
+    }
+
+    // 3. Call FastAPI
+    const response = await fetch(`http://127.0.0.1:8001/chats/${id}/image`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: id, person, role })
+    });
+
+    const data = await response.json();
+    console.log("🖼️ FastAPI response:", Object.keys(data));
+
+    if (!data.image_url) {
+      return res.status(500).json({ error: "Image generation failed" });
+    }
+
+    // 4. Save in DB
+    chat.image_url = data.image_url;
+    await chat.save();
+    console.log("💾 Saved image_url to chat:", chat._id);
+
+    // 5. Return
+    res.json({ image_url: chat.image_url });
+
+  } catch (err) {
+    console.error("❌ Error in /:id/image:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/*router.post("/:id/image", authMiddleware, async (req, res) => {
+  try {
+    const { person, role } = req.body;
+    const { id } = req.params;
+
+    let chat = await Chat.findOne({ _id: id, userId: req.user.id });
     if (!chat) return res.status(404).json({ error: "Chat not found" });
 
-    // 2. Return cached image if exists
     if (chat.image_url) {
       return res.json({ image_url: chat.image_url });
     }
 
-    // 3. Otherwise call FastAPI image generator
-    const response = await fetch("http://localhost:8000/image", {  // ✅ your FastAPI port is 8000, not 8001
+    const response = await fetch(`http://127.0.0.1:8001/chats/${id}/image`, {
       method: "POST",
-      headers: { "Content-Type": "application/json"
-       },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ session_id: id, person, role })
     });
 
@@ -296,17 +341,26 @@ router.post("/:id/image", async (req, res) => {
       return res.status(500).json({ error: "Image generation failed" });
     }
 
-    // 4. Save in DB
-    chat.image_url = data.image_url;
+    // ⬇️ Save base64 to file locally
+    const base64Data = data.image_url.replace(/^data:image\/png;base64,/, "");
+    const fileName = `${id}-${Date.now()}.png`;
+    const filePath = path.join("uploads", fileName);
+
+    fs.writeFileSync(filePath, base64Data, "base64");
+
+    // Create a URL pointing to this file
+    const publicUrl = `http://localhost:5000/uploads/${fileName}`;
+
+    chat.image_url = publicUrl;
     await chat.save();
 
-    // 5. Return new image URL
     res.json({ image_url: chat.image_url });
 
   } catch (err) {
-    console.error("Error in /:id/image route:", err);
+    console.error("❌ Error in /:id/image route:", err);
     res.status(500).json({ error: "Server error" });
   }
-});
+});*/
+
 
 export default router;

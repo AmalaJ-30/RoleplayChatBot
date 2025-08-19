@@ -8,23 +8,32 @@ import famousPeopleRoutes from "./routes/famousPeople.js";
 
 dotenv.config();
 console.log('POSTMARK_API_KEY:', process.env.POSTMARK_API_KEY);
+
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+// ✅ Mount routes
 app.use('/api/auth', authRoutes);
-app.use('/api/chats', chatRoutes);
+app.use('/api/chats', chatRoutes);   // includes /:id/image
 app.use("/api", famousPeopleRoutes);
-// 1 Connect to MongoDB
+//app.use("/uploads", express.static("uploads"));
+
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
-  .catch(err => console.error(err));
+  .catch(err => console.error("❌ MongoDB connection error:", err));
 
-// 2 Test route
+// ✅ Health check route
 app.get('/', (req, res) => {
   res.send('Auth server is running!');
 });
 
-// 3️ Start server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
