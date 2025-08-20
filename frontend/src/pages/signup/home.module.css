@@ -16,10 +16,14 @@
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  background-color: rgb(198, 169, 202);
+    background: 
+  linear-gradient(135deg, #1e1b4b, #6d28d9, #8b5cf6),
+  url("https://transparenttextures.com/patterns/gray-floral.png"); /* C:\Users\shant\Downloads\2025-08-19 16_31_55-.png*/
+background-size: cover;
+background-blend-mode: overlay;
 }
 .title {
-  color: #df77f2;
+  color:  rgb(0, 0, 0);
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 10px;
@@ -29,53 +33,59 @@
   color: #ffffff;
   font-weight: bold;
 }
+
 .loginBox {
-  background-color: #0d0b40;
-  padding: 40px;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(20px); /* for Safari */
+  background: rgba(225, 140, 236, 0.06); /* almost transparent */
   border-radius: 15px;
-  width: 90%;
-  max-width: 500px;
-  box-shadow: 0 8px 20px rgba(128, 82, 82, 0.2);
-  text-align: center;
+  padding: 40px;
+/*box-shadow: 0 8px 32px rgba(0,0,0,0.4);*/
 }
+
 .loginForm {
-  background-color: #0d0b40;
+
   padding: 30px;
   border-radius: 12px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  box-shadow:  rgba(236, 72, 153, 0.4);
   margin-top: 20;
+  color: black;
 }
 
 .inputField {
-  width: 100%;
-  padding: 10px;
-  margin: 10px 0;
+  width: 90%;
+  padding: 12px;
+  margin: 6px 0;
   border-radius: 5px;
   border: none;
   font-size: 14px;
+  background-color: whitesmoke;
+  color: black;
 }
 
 .loginButton {
-  background-color: #c972cf;
+  background: linear-gradient(to right, #a855f7, #d946ef);
   color: white;
   border: none;
   padding: 12px;
-  margin-top: 15px;
+  margin-top: 6px;
   border-radius: 5px;
   font-weight: bold;
-  width: 100%;
+  width: 97%;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 .loginButton:hover {
-  background-color: #a44fb2;
+  opacity: 0.85;
 }
 
 .warningText {
-  color: rgb(255, 0, 0);
+  color: rgb(0, 0, 0);
   font-weight: bold;
   margin-top: 20px;
   max-width: 400px;
@@ -86,10 +96,24 @@
 
 .disclaimer {
   font-size: 14px;
-  color: gray;
+  color:  rgb(0, 0, 0);
   margin-top: 10px;
   max-width: 400px;
   text-align: center; /* 👈 Same deal */
   margin-left: auto;
   margin-right: auto;
+}
+
+.forgotPassword {
+  text-align: right;   /* pushes it to the right side */
+  margin-top: 5px;
+  font-size: 14px;
+  color: #d8b4fe;      /* lavender for consistency */
+  cursor: pointer;
+  text-decoration: underline; /* underlined by default */
+  transition: color 0.3s ease;
+}
+
+.forgotPassword:hover {
+  color: #ffffff; /* brighter on hover */
 }
