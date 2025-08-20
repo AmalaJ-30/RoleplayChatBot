@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./ChatSidebar.module.css";
 import PersonRolePicker from "./PersonRolePicker.jsx";
 
@@ -19,6 +19,11 @@ const ChatSidebar = ({
   const [renamePerson, setRenamePerson] = useState("");
   const [renameRole, setRenameRole] = useState("");
 
+  const [width, setWidth] = useState(() => {
+  return parseInt(localStorage.getItem("sidebarWidth"), 10) || 280;
+});
+const [resizing, setResizing] = useState(false);
+
   const toggleMenu = (id) => {
     setOpenMenuId((prev) => (prev === id ? null : id));
   };
@@ -37,11 +42,50 @@ const ChatSidebar = ({
     }
   };
 
+  useEffect(() => {
+  const handleClickOutside = (e) => {
+    if (!e.target.closest(`.${styles.menuWrapper}`)) {
+      setOpenMenuId(null); // closes dropdown
+    }
+  };
+
+  document.addEventListener("click", handleClickOutside);
+  return () => document.removeEventListener("click", handleClickOutside);
+}, []);
+
+useEffect(() => {
+  const handleMouseMove = (e) => {
+    if (!resizing) return;
+    let newWidth = e.clientX;
+    if (newWidth < 200) newWidth = 100; // min
+    if (newWidth > 400) newWidth = 400; // max
+    setWidth(newWidth);
+  };
+
+  const handleMouseUp = () => {
+    if (resizing) {
+      setResizing(false);
+      localStorage.setItem("sidebarWidth", width);
+    }
+  };
+
+  if (resizing) {
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  }
+  return () => {
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
+}, [resizing, width]);
+
+
   return (
     <div
       className={`${styles.sidebar} ${
         theme === "dark" ? styles.sidebarDark : styles.sidebarLight
       }`}
+       style={{ width: `${width}px` }}
     >
       <h3>Chats</h3>
 
@@ -109,7 +153,12 @@ const ChatSidebar = ({
           </li>
         ))}
       </ul>
+      <div
+  className={styles.resizer}
+  onMouseDown={() => setResizing(true)}
+/>
     </div>
+    
   );
 };
 

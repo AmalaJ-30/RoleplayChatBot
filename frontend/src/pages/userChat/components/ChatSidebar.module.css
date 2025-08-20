@@ -8,6 +8,7 @@
   width: 280px; /* ⬅️ Increase from e.g. 180px or 200px */
   min-width: 260px;
   padding: 1rem;
+  position: relative; 
 }
 
 .header {
@@ -16,13 +17,20 @@
 }
 
 .newChat {
-  background-color: #821299;
+  background: linear-gradient(to right, #9333ea, #c084fc); /* nice purple gradient */
   color: white;
   border: none;
-  padding: 0.5rem;
-  cursor: pointer;
-  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  border-radius: 12px;
   margin-bottom: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.newChat:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
 
 .chatList {
@@ -47,9 +55,18 @@
   overflow: visible;   /* ✅ prevents clipping */
   padding-right: 2rem; /* room for 3-dot button + dropdown */
 }
-.chatItem:hover {
-  background-color: #5d4d64;
-  color: white;
+
+.chatItem:hover{
+  background-color: rgba(170, 130, 239, 0.2); /* purple tint */
+  color: inherit;
+  opacity: 1;
+  pointer-events: auto;
+} 
+.chatItem:hover .menuButton{
+  background-color: none; /* purple tint */
+  color: inherit;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .chatText {
@@ -60,20 +77,21 @@
   white-space: nowrap;
 }
 .active {
-  background: #2c0a3c;
+  background: #7c3aed;  /* vivid purple */
   color: white;
   font-weight: bold;
 }
 
 .sidebarDark {
-  background-color: #111;
-  color: white;
+  background: linear-gradient(180deg, #1e1b4b, #3b0764); /* deep purple blend */
+  color: #f1f1f1;
 }
 
 .sidebarLight {
-  background-color: #f1f1f1;
-  color: black;
+  background: linear-gradient(180deg, #ede9fe, #ddd6fe); /* soft light purple */
+  color: #1f1f1f;
 }
+
 
 .menuWrapper {
   position: relative;
@@ -89,6 +107,7 @@
   padding: 0 0.3rem;
   opacity: 0;
   margin-left: 0.3rem;
+  transition: opacity 0.2s ease;
   
 }
 
@@ -101,31 +120,57 @@
 .dropdown {
   position: absolute;
   z-index: 999;
-  background: var(--menu-bg, white);
-  padding: 0.5rem;
-  border-radius: 8px;
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
-
   top: 100%;
   right: 0;
   margin-top: 0.25rem;
-  background-color: var(--menu-bg, white);
-  min-width: 100px;
+
+  /* Glassmorphism effect */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  min-width: 140px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;      
+  overflow: hidden;
+  padding: 0.3rem 0;
 }
 
 .dropdown button {
   background: transparent;
   border: none;
-  color: rgb(0, 0, 0);
+  color: white;
   cursor: pointer;
-  padding: 6px;
-  width: 100%;
-  text-align: left;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: background 0.25s ease, transform 0.15s ease;
+  width: auto;
+  align-self: flex-start;
 }
 
 .dropdown button:hover {
-  background: rgb(227, 220, 225);
+  background: linear-gradient(90deg, #9333ea, #c084fc); /* purple gradient */
+  color: white;
+  transform: translateX(2px); /* slight slide effect */
+}
+
+
+.resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.2s;
+}
+
+.resizer:hover {
+  background: rgba(124, 58, 237, 0.3); /* subtle purple highlight */
 }
