@@ -66,7 +66,7 @@ async def generate_image(chat_id: str, request: ImageRequest):
 '''
 # backend/image_gen.py
 import os
-import base64
+#import base64
 import traceback
 from fastapi import APIRouter
 from pydantic import BaseModel
@@ -94,14 +94,14 @@ async def generate_image(chat_id: str, request: ImageRequest):
             model="dall-e-3",
             prompt=prompt,
             size="1024x1024",
-            response_format="b64_json"
+            response_format="url"
         )
 
         # Extract base64 string
-        image_b64 = result.data[0].b64_json
+        #image_b64 = result.data[0].b64_json
 
         # Convert into data URI for frontend
-        image_url = f"data:image/png;base64,{image_b64}"
+        image_url = result.data[0].url
 
         return {
             "session_id": request.session_id,
