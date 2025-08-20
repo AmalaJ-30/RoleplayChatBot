@@ -1,10 +1,11 @@
 .signupContainer {
-  width: 100%;
-  max-width: 400px;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0px 400px 100px rgba(0, 0, 0, 0.2);
-  background-color: rgb(10, 10, 49);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(20px); /* for Safari */
+  background: rgba(255, 255, 255, 0.08); /* almost transparent */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+  border-radius: 1rem;
+  padding: 2rem;
 }
 .pageWrapper {
   display: flex;
@@ -12,19 +13,26 @@
   align-items: center;
   min-height: 100vh;
   width: 100vw;
-  background-color: inherit;
+  background: 
+  linear-gradient(135deg, #1e1b4b, #6d28d9, #8b5cf6),
+  url("https://www.transparenttextures.com/patterns/diagmonds-light.png"); /* C:\Users\shant\Downloads\2025-08-19 16_31_55-.png*/
+background-size: cover;
+background-blend-mode: overlay;
 }
+
 /* Title and subtitle */
 .signupTitle {
   font-size: 24px;
   font-weight: bold;
-  color: rgb(176, 111, 176);
+  color: #E9D5FF;
+  text-align: center;
 }
 
 .signupSubtitle {
   font-size: 16px;
-  color: gray;
+  color: #D1D5DB;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 /* Form styling */
@@ -39,11 +47,11 @@
   max-width: 300px;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ccc;
+  border: 1px solid #bc71e8;
   border-radius: 5px;
   font-size: 16px;
   background-color: white;
-  color: black;
+  color: #1F2937;
 }
 
 /* Signup Button */
@@ -61,12 +69,12 @@
 }
 
 .signupButton:hover {
-  background-color: rgb(121, 110, 121);
+  background-color: rgb(201, 143, 201);
 }
 
 /* Message after signup */
 .signupMessage {
   font-size: 14px;
-  color: gray;
+  color: #FFFFFF;
   margin-top: 20px;
 }
