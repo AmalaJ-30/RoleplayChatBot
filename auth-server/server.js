@@ -7,8 +7,6 @@ import chatRoutes from './routes/chat.js';
 import famousPeopleRoutes from "./routes/famousPeople.js";
 
 dotenv.config();
-const express = require("express");
-const cors = require("cors");
 
 const app = express();
 
