@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/auth.js';
-import chatRoutes from './routes/chat.js';
-//import famousPeopleRoutes from "./routes/famousPeople.js";
+//import chatRoutes from './routes/chat.js';
+import famousPeopleRoutes from "./routes/famousPeople.js";
 
 dotenv.config();
 
@@ -20,8 +20,8 @@ app.options("*", cors());
 app.use(express.json());
 // ✅ Mount routes
 app.use('/api/auth', authRoutes);
-app.use('/api/chats', chatRoutes);   // includes /:id/image
-//app.use("/api", famousPeopleRoutes);
+//app.use('/api/chats', chatRoutes);   // includes /:id/image
+app.use("/api", famousPeopleRoutes);
 //app.use("/uploads", express.static("uploads"));
 
 // ✅ Connect to MongoDB
