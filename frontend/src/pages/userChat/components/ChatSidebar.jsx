@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import styles from "./ChatSidebar.module.css";
 import PersonRolePicker from "./PersonRolePicker.jsx";
-
+import { Link } from "react-router-dom";
 
 const ChatSidebar = ({
   chats,
@@ -87,7 +87,15 @@ useEffect(() => {
       }`}
        style={{ width: `${width}px` }}
     >
-      <h3>Chats</h3>
+      <h3
+        
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+  Chats
+  <Link to="/profile">
+    <span style={{ cursor: "pointer", fontSize: "18px" }}>👤</span>
+  </Link>
+
+      </h3>
 
       <button
         className={styles.newChat}
@@ -109,23 +117,37 @@ useEffect(() => {
             onClick={() => onSelectChat(chat._id)}
           >
             {renamingChatId === chat._id ? (
-              <div>
-                {/* ✅ Show dropdowns when renaming */}
-                <PersonRolePicker
-                  person={renamePerson}
-                  setPerson={setRenamePerson}
-                  role={renameRole}
-                  setRole={setRenameRole}
-                  famousPeople={famousPeople}
-                  roles={roles}
-                />
-                <button onClick={(e) => { e.stopPropagation(); saveRename(chat._id); }}>
-                  ✅ Save
-                </button>
-                <button onClick={(e) => { e.stopPropagation(); setRenamingChatId(null); }}>
-                  ❌ Cancel
-                </button>
-              </div>
+             <div className={styles.renameBox}>
+  <PersonRolePicker
+    person={renamePerson}
+    setPerson={setRenamePerson}
+    role={renameRole}
+    setRole={setRenameRole}
+    famousPeople={famousPeople}
+    roles={roles}
+  />
+  <div className={styles.renameActions}>
+    <button
+      className={styles.renameSave}
+      onClick={(e) => {
+        e.stopPropagation();
+        saveRename(chat._id);
+      }}
+    >
+      ✅ Save
+    </button>
+    <button
+      className={styles.renameCancel}
+      onClick={(e) => {
+        e.stopPropagation();
+        setRenamingChatId(null);
+      }}
+    >
+      ❌ Cancel
+    </button>
+  </div>
+</div>
+
             ) : (
               <>
                 {chat.person} as <em>{chat.role}</em>

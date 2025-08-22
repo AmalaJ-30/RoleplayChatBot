@@ -1,9 +1,4 @@
-body {
-  margin: 0;
-  background-color: #1a1a1a; /* Or your light theme fallback */
-}
-
-
+/* MAIN LAYOUT */
 .userchatContainer {
   flex: 1;
   display: flex;
@@ -12,37 +7,32 @@ body {
   background-color: transparent;
 }
 
-/* Wrap the whole page in a full-screen flexbox */
 .pageWrapper {
   display: flex;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  background-color: inherit;
   overflow: hidden;
-
-  
 }
 
 .layoutWrapper {
   display: flex;
   height: 100%;
   width: 100%;
-  
 }
 
-/* Themes */
+/* THEMES */
 .themeDark {
-  background-color: #1a1a1a;
+  background: linear-gradient(180deg, #1e1b4b, #3b0764);
   color: white;
 }
 
 .themeLight {
-  background-color: #f5f5f5;
+  background: linear-gradient(180deg, #ede9fe, #ddd6fe);
   color: black;
 }
 
-/* Toggle */
+/* THEME TOGGLE */
 .themeToggle {
   position: absolute;
   top: 10px;
@@ -56,157 +46,215 @@ body {
   font-size: 14px;
 }
 
-/* Selection */
+/* TOP SELECTION AREA */
 .selectionBox {
-  margin-bottom: 20px;
+  margin: 20px auto;
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
+  gap: 12px; /* consistent space between elements */
 }
-/* 67 - 86 handle the famous person name and role text boxes at the top to make sure they change to light and dark mode accordingly*/
-.chatboxInput {
-  padding: 10px;
+
+/* Person input + Role dropdown + Start button */
+.chatboxInput,
+.roleSelect,
+.startButton {
+  height: 44px;
+  border-radius: 8px;
   border: none;
-  border-radius: 5px;
   font-size: 14px;
-  width: 200px;
+  padding: 0 12px;
 }
 
-/* Light mode */
-.themeLight .chatboxInput {
-  background-color: #ffffff;
-  color: #000000;
+/* Person input */
+.chatboxInput {
+  width: 220px;
 }
 
-/* Dark mode */
-.themeDark .chatboxInput {
-  background-color: #333333;
-  color: #ffffff;
-}
-
-/* Chatbox */
-.chatMain {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
-  justify-content: flex-end; /* messages pinned bottom */
-  background-size: cover; 
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-
-.chatbox {
-  position: relative;
-  z-index: 1; /* content above background */
-}
-
-
-/* Bubbles */
-.chatBubble {
-  margin-bottom: 10px;
-  max-width: 40%;
-  width: fit-content;
-  padding: 10px 15px;
-  border-radius: 20px;
-  line-height: 1.5;
-  font-size: 15px;
-}
-
-.user {
-  align-self: flex-end;
-  background-color: #2c0a3c;
-  color: white;
-  margin-left: auto;  /* ✅ push to right */
-  margin-right: 20px;
-
-  
-}
-
-.ai {
-  align-self: flex-start;
-  background-color: black;
-  color: rgb(255, 255, 255);
-   margin-right: auto; /* ✅ push to left */
-  margin-left: 20px;
-
-}
-
-/* Message Input */
-.messageInput {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  padding: 20px 0;
-  background-color: inherit;
-  border-radius: 10px;
-
-  display: flex;
-  justify-content: center;
-  width: 100%;
-
-}
-
-.input {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 5px;
-  font-size: 16px;
-}
-.inputWrapper {
-  display: flex;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-.sendButton {
-  padding: 10px;
-  margin-left: 10px;
-  background: #a314dc;
-  color: white;
-  border: none;
+/* Role dropdown */
+.roleSelect {
+  width: 180px;
   cursor: pointer;
-  border-radius: 5px;
-  transition: background 0.3s ease;
+}
+.roleSelect option {
+  background: #2b1749; 
+  color: white;
 }
 
-.sendButton:hover {
-  background: #a314dc;
+/* Start Chat button */
+.startButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  padding: 0 20px;
+  min-width: 120px;
+  background: linear-gradient(135deg, #9333ea, #c084fc);
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: 0.2s ease;
+}
+.startButton:hover {
+  opacity: 0.9;
 }
 
+/* LIGHT/DARK INPUT THEMES */
+.themeLight .chatboxInput,
+.themeLight .roleSelect {
+  background: linear-gradient(180deg, #ede9fe, #ddd6fe);
+  color: black;
+}
+.themeDark .chatboxInput,
+.themeDark .roleSelect {
+  background: linear-gradient(180deg, #1e1b4b, #3b0764);
+  color: white;
+}
+
+/* DROPDOWN AUTOCOMPLETE (famous people) */
 .personInputWrapper {
-  position: relative;   /* so dropdown can be positioned relative to input */
+  position: relative;
   display: inline-block;
-  width: 100%;
   max-width: 300px;
+  width: 100%;
 }
-
 .personSuggestions {
   position: absolute;
-top: 100%;   /* directly below input */
+  top: 100%;
   left: 0;
-  width: 100%; /* match input width */
-  right: 0;
+  width: 100%;
   background: #1f1b3a;
-  border: 1px solid #333;
   border-radius: 8px;
   max-height: 200px;
   overflow-y: auto;
   list-style: none;
-  padding: 0;
   margin: 5px 0 0 0;
+  padding: 0;
   z-index: 1000;
 }
-
 .personSuggestions li {
   padding: 10px;
   cursor: pointer;
   color: white;
 }
-
 .personSuggestions li:hover {
   background: #2b274b;
+}
+
+/* CHAT AREA */
+.chatMain {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: flex-end;
+  background-color: var(--chat-bg);
+  background-size: contain;
+  background-position: center top;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+/* Theme-specific blended background */
+.themeDark .chatMain {
+  --chat-bg: linear-gradient(180deg, #1e1b4b, #3b0764);
+}
+.themeLight .chatMain {
+  --chat-bg: linear-gradient(180deg, #ede9fe, #ddd6fe);
+}
+
+
+.chatbox {
+  flex: 1;                       /* ✅ take all space above input */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;     /* ✅ pin messages to bottom */
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.chatBubble {
+  margin-bottom: 10px;
+  max-width: 60%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Default (dark theme look) */
+.user {
+  align-self: flex-end;
+  background-color: #2c0a3c;  /* deep purple */
+  color: white;
+  margin: 0 20px 10px auto;
+}
+
+.ai {
+  align-self: flex-start;
+  background-color: #111;  /* near black */
+  color: white;
+  margin: 0 auto 10px 20px;
+}
+
+/* 🌞 Light mode adjustments */
+.themeLight .user {
+  background-color: #e0c3fc;   /* soft lavender */
+  color: #1e1e1e;              /* dark text for contrast */
+}
+
+.themeLight .ai {
+  background-color: #f3f3f3;   /* light gray */
+  color: #1e1e1e;              /* readable dark text */
+}
+
+
+/* MESSAGE INPUT BAR */
+.messageInput {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 12px 20px;
+  backdrop-filter: blur(12px);       /* ✅ blur whatever is behind */
+  background: rgba(0, 0, 0, 0.4);    /* ✅ translucent dark */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Light mode adjustment */
+
+
+.inputWrapper {
+  display: flex;
+  width: 100%;
+  max-width: 600px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  
+}
+
+.input {
+  flex: 1;
+  padding: 6px;
+  border: none;
+  font-size: 16px;
+  color: inherit;
+  background: transparent;
+  resize: none;          /* ✅ prevent manual resize corner */
+  overflow: hidden;      /* ✅ so it grows naturally */
+}
+
+.sendButton {
+  padding: 0 20px;
+  border: none;
+  background: linear-gradient(135deg, #9333ea, #c084fc);
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+.sendButton:hover {
+  opacity: 0.9;
 }
