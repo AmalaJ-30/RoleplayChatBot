@@ -32,7 +32,12 @@ router.post('/signup', async (req, res) => {
   if (!strongPassword.test(password)) {
     return res.status(400).json({ message: "Password must be at least 8 characters, include a number and a symbol." });
   }*/
-
+        const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
+    if (!strongPassword.test(password)) {
+      return res.status(400).json({ 
+        message: "Password must be at least 8 characters, include a number and a symbol." 
+      });
+    }
 
     // 2️⃣ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -120,7 +125,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: "We cannot find you in our system, please make sure your username and password are correct" });
     }
     
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "6h" });
     
     // 4️⃣ Success
     res.json({ message: "Login successful!", token });
@@ -185,5 +190,25 @@ router.put("/reset-password", async (req, res) => {
   res.json({ message: "Password reset successful" });
 });
 
+// authserver/routes/auth.js this delete a PERSON'S ACCOUNT, not a chat, the chat one is in chat.js
+router.delete("/delete", authMiddleware, async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.json({ success: true, message: "Account deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error deleting account" });
+  }
+});
+
+router.get("/me", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password"); // don't send password hash
+    if (!user) return res.status(404).json({ error: "User not found" });
+    res.json(user);
+  } catch (err) {
+    console.error("❌ Error fetching user profile:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
 
 export default router;
