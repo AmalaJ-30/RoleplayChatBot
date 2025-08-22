@@ -15,6 +15,7 @@ function Home() {
     setError(""); // Clear old errors
 
     try {
+      console.log('API base =', import.meta.env.VITE_API_URL);
        const res = await fetch(`${API}/api/auth/login`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
