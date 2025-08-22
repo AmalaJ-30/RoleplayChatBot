@@ -7,7 +7,7 @@ import chatRoutes from './routes/chat.js';
 import famousPeopleRoutes from "./routes/famousPeople.js";
 
 dotenv.config();
-console.log('POSTMARK_API_KEY:', process.env.POSTMARK_API_KEY);
+
 
 const app = express();
 
