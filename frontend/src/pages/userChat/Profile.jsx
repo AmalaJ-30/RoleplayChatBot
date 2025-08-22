@@ -21,6 +21,14 @@ function Profile() {
     fetchProfile();
   }, []);
 
+  function getInitials(name = "") {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+}
+
   const handleDeleteAccount = async () => {
     if (!window.confirm("⚠️ This will permanently delete your account. Continue?")) return;
 
@@ -63,6 +71,15 @@ return (
         <div className={styles.icon}>👤</div>
         <h2 className={styles.title}>Profile</h2>
         
+        <div className="flex flex-col items-center mb-6">
+  <div className="w-20 h-20 flex items-center justify-center rounded-full bg-purple-600 text-white text-2xl font-bold shadow-lg">
+    {getInitials(`${user.firstName || ""} ${user.lastName || ""}`)}
+  </div>
+  
+  <p className="text-gray-500">{user.email}</p>
+</div>
+
+
         <div className={styles.infoRow}>
           <span className={styles.label}>Username:</span> {user.username}
         </div>
@@ -84,6 +101,15 @@ return (
             Delete Account
           </button>
         </div>
+        <button
+  onClick={() => {
+    localStorage.removeItem("token");   // clear login token
+    window.location.href = "/";    // redirect to login page
+  }}
+  className="w-full py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+>
+  Log Out
+</button>
       </div>
     </div>
   );
