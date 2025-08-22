@@ -11,8 +11,23 @@ dotenv.config();
 const app = express();
 
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://stellular-pavlova-647c52.netlify.app",
+  "https://theairoleplay.com",
+  "https://www.theairoleplay.com"
+];
+
 app.use(cors({
-  origin: ["http://localhost:5173", "https://stellar-pavlova-647c52.netlify.app", "https://theairoleplay.com"],
+  origin: function (origin, callback) {
+    // allow requests with no origin (curl, Postman, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error("CORS not allowed: " + origin), false);
+    }
+    return callback(null, true);
+  },
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
