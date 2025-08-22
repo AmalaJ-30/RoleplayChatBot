@@ -1,5 +1,5 @@
 // fetchFamousPeople.js
-import fs from "fs";
+/*import fs from "fs";
 import fetch from "node-fetch";
 
 // Output file path (this will be created or overwritten)
@@ -48,7 +48,8 @@ async function main() {
 
 main(); */
 
-const OUTPUT_FILE = new URL("../famousPeople.json", import.meta.url);
+/*const OUTPUT_FILE = new URL("../famousPeople.json", import.meta.url);
+
 
 // ✅ Categories to fetch
 const categories = [
@@ -106,3 +107,45 @@ async function main() {
 }
 
 main();
+*/
+
+// routes/famousPeople.js
+import express from "express";
+import fetch from "node-fetch";
+
+const router = express.Router();
+
+async function fetchCategory(title) {
+  const url =
+    `https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=${encodeURIComponent(title)}&format=json&cmlimit=500`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+
+  const data = await res.json();
+  return data.query.categorymembers
+    .map((p) => p.title)
+    .filter(
+      (title) =>
+        !title.startsWith("Category:") &&
+        !title.startsWith("List of") &&
+        !title.includes("Bibliographies") &&
+        !title.includes("Project") &&
+        !title.includes("Fictional") &&
+        title.trim().length > 0
+    );
+}
+
+// GET /api/famous-people?category=Category:Pop_singers
+router.get("/famous-people", async (req, res) => {
+  try {
+    const category = req.query.category || "Category:Presidents_of_the_United_States";
+    const people = await fetchCategory(category);
+    res.json({ category, people });
+  } catch (err) {
+    console.error("❌ Error fetching category:", err);
+    res.status(500).json({ error: "Failed to fetch category" });
+  }
+});
+
+export default router;
