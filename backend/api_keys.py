@@ -2,6 +2,7 @@
 #remeber that this does not remeber information when you go back and forth between session ID'S - it does now
 import getpass
 import os
+from functools import lru_cache
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from langchain_core.messages import AIMessage
@@ -24,6 +25,18 @@ router = APIRouter()
 os.environ["LANGCHAIN_TRACKING_V2"] = "true"
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 model = ChatOpenAI(model="gpt-3.5-turbo")
+
+@lru_cache(maxsize=1)
+def get_chat_model():
+    # Remove any proxy vars that Render/host might inject
+    for k in ("OPENAI_PROXY", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "OPENAI_HTTP_PROXY"):
+        os.environ.pop(k, None)
+
+    return ChatOpenAI(
+        model="gpt-3.5-turbo",
+        openai_api_key=os.environ.get("OPENAI_API_KEY")
+    )
+
 store = {}
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
