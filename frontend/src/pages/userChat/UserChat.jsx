@@ -20,8 +20,8 @@ function UserChat() {
   //const [chatImage, setChatImage] = useState(null);
   const [backgroundImage, setBackgroundImage] = useState(null);
 
-
-  
+const FASTAPI_BASE = import.meta.env.VITE_FASTAPI_URL.replace(/\/+$/, '');
+  const API_BASE = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
   // 1. Set theme first (dark/light)
   useEffect(() => {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -116,7 +116,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     // Update backend chat with new message
-    await fetch(`http://localhost:5000/api/chats/${activeChatId}/messages`, {
+    await request(`/api/chats/${activeChatId}/messages`, {
     //await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
       method: "PUT",
       headers: {
@@ -127,7 +127,7 @@ useEffect(() => {
     });
 
     // Call AI backend for reply
-  const response = await fetch("http://localhost:8001/chat", {
+  const response = await fetch(`${FASTAPI_BASE}/chat`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ session_id: activeChatId, person, role, message: tempMessage })
@@ -140,7 +140,7 @@ useEffect(() => {
     setConversation(finalMessages);
 
     // Save final messages to 
-    await fetch(`http://localhost:5000/api/chats/${activeChatId}/messages`, {
+    await fetch(`${API_BASE}/api/chats/${activeChatId}/messages`, {
     //await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
       method: "PUT",
       headers: {
