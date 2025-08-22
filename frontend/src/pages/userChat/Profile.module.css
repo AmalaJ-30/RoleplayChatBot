@@ -1,0 +1,11 @@
+.btn {
+  margin: 8px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: #9333ea;
+  color: white;
+  cursor: pointer;
+}
+.btn.danger {
+  background: red;
+}

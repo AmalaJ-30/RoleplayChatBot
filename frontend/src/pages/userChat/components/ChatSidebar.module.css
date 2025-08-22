@@ -41,20 +41,29 @@
 }
 
 .chatItem {
-  padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  border-radius: 20px;
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 0.6rem;
+  border-radius: 16px;
   cursor: pointer;
   transition: background-color 0.2s;
-  display: flex;
+  
+  display: flex;             /* ✅ back to flex */
   justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-  position: relative;  /* 🔑 anchor for absolute dropdown */
-  overflow: visible;   /* ✅ prevents clipping */
-  padding-right: 2rem; /* room for 3-dot button + dropdown */
+  align-items: flex-start;   /* ✅ text wraps, menu stays top-aligned */
+  gap: 0.75rem;
+  position: relative;
+
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.5;
 }
+
+.chatText {
+  flex: 1;                   /* ✅ take available space */
+  white-space: normal;       /* ✅ wrapping allowed */
+  word-break: break-word;
+}
+
 
 .chatItem:hover{
   background-color: rgba(170, 130, 239, 0.2); /* purple tint */
@@ -79,7 +88,6 @@
 .active {
   background: #7c3aed;  /* vivid purple */
   color: white;
-  font-weight: bold;
 }
 
 .sidebarDark {
@@ -173,4 +181,115 @@
 
 .resizer:hover {
   background: rgba(124, 58, 237, 0.3); /* subtle purple highlight */
+}
+
+.renameBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;                     /* consistent spacing */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  border-radius: 16px;
+  margin-top: 0.5rem;
+}
+
+.renameBox input,
+.renameBox select,
+.renameActions button {
+  width: 100%;                     /* all same width */
+  height: 44px;                    /* uniform height */
+  padding: 0 0.8rem;               /* equal horizontal padding */
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-sizing: border-box;          /* ✅ keeps consistent sizing */
+}
+
+.renameBox input,
+.renameBox select {
+  color: white;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  margin-bottom: 0.6rem;
+}
+
+.renameBox input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.renameActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.renameSave {
+  background: linear-gradient(to right, #9333ea, #c084fc);
+  color: white;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.renameSave:hover {
+  transform: scale(1.03);
+  opacity: 0.95;
+}
+
+.renameCancel {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f87171;
+  cursor: pointer;
+}
+
+.renameCancel:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.renameBox select {
+  color: white;  /* ✅ selected role text white */
+  background: linear-gradient(to right, #9333ea, #c084fc); /* ✅ on-theme gradient */
+  border: none;
+  border-radius: 12px;
+  padding: 0 0.8rem;
+  height: 44px;
+  font-weight: 500;
+  appearance: none;  /* ✅ remove default arrow so we can theme it */
+  background-clip: padding-box;
+  cursor: pointer;
+
+}
+
+.renameBox select option {
+  color: #1f1f1f;           /* ✅ ensure options text is dark */
+  background: white;        /* ✅ readable contrast */
+}
+
+.renameBox select {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: white;
+  background: rgba(255, 255, 255, 0.15);  /* ✅ frosted glass look */
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  box-sizing: border-box;
+  appearance: none;  /* remove native styling */
+}
+
+.renameBox select option {
+  background: #a177c2;  /* deep purple background */
+  color: white;
+  padding: 0.3rem;
+}
+
+
+.renameBox select option:hover {
+  background: #9333ea;  /* highlight with purple */
 }

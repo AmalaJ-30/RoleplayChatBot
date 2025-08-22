@@ -326,6 +326,20 @@ const handleRenameChat = async (chatId, newPerson, newRole) => {
   }
 };
 
+const handleKeyDown = (e) => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();  // enter sends
+    handleSendMessage();
+  }
+};
+
+useEffect(() => {
+  const textarea = document.querySelector(`.${styles.input}`);
+  if (textarea) {
+    textarea.style.height = "auto";         // reset
+    textarea.style.height = `${textarea.scrollHeight}px`;  // expand
+  }
+}, [message]);
 
 
 
@@ -386,54 +400,51 @@ const roles = [
 </button>
 
 {!selectionLocked && (
-  <div className={styles.selectionBox}>
-<div className={styles.personInputWrapper}>
- <input
-  type="text"
-  value={person}
-  onChange={handlePersonChange}
-  placeholder="Enter a famous person"
-  className={styles.chatboxInput}
-/>
-
-
-  {suggestions.length > 0 && (
-    <ul className={styles.personSuggestions}>
-      {suggestions.map((name, i) => (
-        <li key={i} onClick={() => {
-          setPerson(name);
-          setSuggestions([]);
-        }}>
-          {name}
-        </li>
-      ))}
-    </ul>
-  )}
-</div>
-
-
-    <select
-  value={role}
-  onChange={(e) => setRole(e.target.value)}
-  className={styles.chatboxInput}
->
-  <option value="">-- Select a role --</option>
-  {roles.map((r, i) => (
-    <option key={i} value={r}>{r}</option>
-  ))}
-</select>
-
-    <button onClick={handleSelection} className={styles.sendButton}>
-      Start Chat
-    </button>
+<div className={styles.selectionBox}>
+  <div className={styles.personInputWrapper}>
+    <input
+      type="text"
+      value={person}
+      onChange={handlePersonChange}
+      placeholder="Enter a famous person"
+      className={styles.chatboxInput}
+    />
+    {suggestions.length > 0 && (
+      <ul className={styles.personSuggestions}>
+        {suggestions.map((name, i) => (
+          <li key={i} onClick={() => {
+            setPerson(name);
+            setSuggestions([]);
+          }}>
+            {name}
+          </li>
+        ))}
+      </ul>
+    )}
   </div>
-)}
+
+  <select
+    value={role}
+    onChange={(e) => setRole(e.target.value)}
+    className={styles.roleSelect}
+  >
+    <option value="">-- Select a role --</option>
+    {roles.map((r, i) => (
+      <option key={i} value={r}>{r}</option>
+    ))}
+  </select>
+
+  <button onClick={handleSelection} className={styles.startButton}>
+    Start Chat
+  </button>
+</div>
+)} 
 
 <div 
   className={styles.chatMain}
   style={{
     backgroundImage: backgroundImage ? `url(${backgroundImage})` : "none",
-    backgroundSize: "contain",   // ✅ fit whole image
+    backgroundSize: "cover",   // ✅ fit whole image
     backgroundPosition: "top center",  // ✅ show head
     backgroundRepeat: "no-repeat",
   }}
@@ -449,23 +460,36 @@ const roles = [
 
   <div className={styles.messageInput}>
   <div className={styles.inputWrapper}>
-    <input
-      type="text"
-      placeholder="Type a message..."
-      value={message}
-      onChange={(e) => setMessage(e.target.value)}
-      disabled={!selectionLocked}
-      className={styles.input}
-    />
+   <textarea
+  rows={1}
+  placeholder="Type a message..."
+  value={message}
+  onChange={(e) => {
+    setMessage(e.target.value);
+
+    // ✅ Auto-grow textarea
+    e.target.style.height = "auto";
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  }}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  }}
+  disabled={!selectionLocked}
+  className={styles.input}
+/>
     <button
       onClick={handleSendMessage}
       disabled={!selectionLocked}
       className={styles.sendButton}
     >
-      Send
+      📩
     </button>
-    </div>
   </div>
+</div>
+
 </div>
 </div>
     </div>
