@@ -17,12 +17,27 @@ const navigate = useNavigate();
     password: ""
   });
 
+  const naviagte = useNavigate();
+  const [formDatawithoutpassword, setformDatawithoutpassword] = useState ({
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: ""
+  })
+  const [error, setError] = useState("");
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError("");
   };
 
-  const handleSubmit = async (e) => {
+/*  const handleSubmit = async (e) => {
     e.preventDefault();
+
+     const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
+    if (!strongPassword.test(formData.password)) {
+      setError("Password must be at least 8 characters, include a number and a symbol.");
+      return;
+    }
 
     try {
       const response = await fetch("http://localhost:5000/api/auth/signup", {
@@ -44,6 +59,43 @@ const navigate = useNavigate();
       alert("Server error, check console.");
     }
   };
+******/
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  console.log("🚀 Signup attempt with data:", formDatawithoutpassword);
+
+  const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
+  if (!strongPassword.test(formData.password)) {
+    console.log("❌ Weak password, blocking submit");
+    setError("Password must be at least 8 characters, include a number and a symbol.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:5000/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+    console.log("📡 API response:", data);
+
+    if (response.ok) {
+      alert(`Signup successful! Please expect an email from "CampusMind" and verify your email address to be able to login`);
+      navigate("/");
+    } else {
+      alert(data.message || "Signup failed");
+    }
+  } catch (err) {
+    console.error("🔥 API call failed:", err);
+    alert("Server error, check console.");
+  }
+};
+
+  
 
   return (
     <form onSubmit={handleSubmit} className={formClass}>
@@ -52,6 +104,8 @@ const navigate = useNavigate();
       <input name="email" placeholder="Email Address" value={formData.email} onChange={handleChange} className={inputClass} />
       <input name="username" placeholder="Create Username" value={formData.username} onChange={handleChange} className={inputClass} />
       <input name="password" type="password" placeholder="Create Password" value={formData.password} onChange={handleChange} className={inputClass} />
+      {error && <p style={{ color: "black", marginTop: "8px" }}>{error}</p>}
+
       <button type="submit" className={buttonClass}>Signup</button>
     </form>
   );

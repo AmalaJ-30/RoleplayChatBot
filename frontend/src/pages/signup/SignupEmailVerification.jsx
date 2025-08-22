@@ -25,47 +25,65 @@ export default function SignupEmailVerification() {
     }
   };
 
-  return (
+return (
+  <div
+    style={{
+      background: "linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)", 
+      color: "white",
+      minHeight: "100vh",
+      width: "100vw",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      fontFamily: "Inter, sans-serif",
+    }}
+  >
+    {/* Glassy Card Wrapper */}
     <div
       style={{
-        backgroundColor: "#0f172a",
-        color: "white",
-        minHeight: "100vh",   // changed from height
-    width: "100vw",    
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
+        background: "rgba(0, 0, 0, 0.4)",   // semi-transparent overlay
+        backdropFilter: "blur(12px)",       // frosted glass effect
+        borderRadius: "12px",
+        padding: "40px",
+        maxWidth: "500px",
         textAlign: "center",
-        padding: "20px",
-        fontFamily: "Inter, sans-serif",
+        boxShadow: "0 4px 30px rgba(0,0,0,0.2)",
       }}
     >
-      <h1 style={{ fontSize: "1.8rem", fontWeight: "600", marginBottom: "0.75rem" }}>
+      <h1 style={{ fontSize: "1.8rem", fontWeight: "600", marginBottom: "1rem" }}>
         Verify Your Email
       </h1>
-      <p style={{ fontSize: "1rem", maxWidth: "500px", opacity: 0.9 }}>
-        You signed up for our <strong>Roleplay Chat Box</strong> app with this
+
+      <p style={{ fontSize: "1rem", opacity: 0.9, marginBottom: "2rem" }}>
+        You signed up for my <strong>Roleplay Chat Box</strong> app with this
         email. Please click <span style={{ color: "#4ade80" }}>YES</span> if it
         was you, or <span style={{ color: "#f87171" }}>NO</span> if it was not.
       </p>
 
-      <div style={{ marginTop: "2rem", display: "flex", gap: "1rem" }}>
+      {/* Buttons */}
+      <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
         <button
           onClick={() => handleVerification(true)}
           style={{
-            backgroundColor: "#3b82f6",
+            background: "linear-gradient(to right, #3b82f6, #60a5fa)", // YES
             color: "white",
-            padding: "0.5rem 1.5rem",
+            padding: "0.6rem 1.8rem",
             borderRadius: "8px",
             border: "none",
             fontSize: "1rem",
-            fontWeight: "500",
+            fontWeight: "600",
             cursor: "pointer",
-            transition: "background-color 0.2s",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            transition: "transform 0.2s, opacity 0.2s",
           }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = "#2563eb")}
-          onMouseOut={(e) => (e.target.style.backgroundColor = "#3b82f6")}
+          onMouseOver={(e) => {
+            e.target.style.transform = "scale(1.05)";
+            e.target.style.opacity = "0.9";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = "scale(1)";
+            e.target.style.opacity = "1";
+          }}
         >
           YES
         </button>
@@ -73,18 +91,25 @@ export default function SignupEmailVerification() {
         <button
           onClick={() => handleVerification(false)}
           style={{
-            backgroundColor: "#ef4444",
+            background: "linear-gradient(to right, #ef4444, #f87171)", // NO
             color: "white",
-            padding: "0.5rem 1.5rem",
+            padding: "0.6rem 1.8rem",
             borderRadius: "8px",
             border: "none",
             fontSize: "1rem",
-            fontWeight: "500",
+            fontWeight: "600",
             cursor: "pointer",
-            transition: "background-color 0.2s",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+            transition: "transform 0.2s, opacity 0.2s",
           }}
-          onMouseOver={(e) => (e.target.style.backgroundColor = "#dc2626")}
-          onMouseOut={(e) => (e.target.style.backgroundColor = "#ef4444")}
+          onMouseOver={(e) => {
+            e.target.style.transform = "scale(1.05)";
+            e.target.style.opacity = "0.9";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.transform = "scale(1)";
+            e.target.style.opacity = "1";
+          }}
         >
           NO
         </button>
@@ -96,5 +121,7 @@ export default function SignupEmailVerification() {
         </p>
       )}
     </div>
-  );
+  </div>
+);
+
 }

@@ -12,7 +12,7 @@ function Signup() {
   return (
     <div className={styles.pageWrapper}>
     <div className={styles.signupContainer}>
-    <h1 className={styles.signupTitle}>Welcome to Our Roleplay Chatbot</h1>
+    <h1 className={styles.signupTitle}>Welcome to my Roleplay Chatbot</h1>
     <p className={styles.signupSubtitle}>Please enter your info below:</p>
   
       <div className={styles.signupForm}>

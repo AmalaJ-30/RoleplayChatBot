@@ -86,11 +86,11 @@ function Home() {
   value={password}
   onChange={(e) => setPassword(e.target.value)}
 />
-          <button className={styles.loginButton} onClick={handleLogin}>Login</button>
-        </div>
+        
+        <button className={styles.loginButton} onClick={handleLogin}>Login</button>
 
-        <p 
-  style={{ cursor: 'pointer', marginTop: '10px', color: '#9b5de5' }} 
+ <p 
+  className={styles.forgotPassword}
   onClick={handleForgotPassword}
 >
   Forgot Password?
@@ -98,14 +98,15 @@ function Home() {
 
         <p className={styles.warningText}>
           Please note that the conversations you are about to have are with AI bots. <br />
-          You are <strong>NOT</strong> talking to real celebrities.
+          You are <strong>NOT</strong> talking to real historical figures.
         </p>
 
         <p className={styles.disclaimer}>
-          We will not be held accountable for actions you commit based on your conversations with this bot.
+         I will not be held accountable for actions you commit based on your conversations with this bot.
         </p>
         {error && <p style={{ color: "red", marginTop: "10px" }}>{error}</p>}
 
+</div>
       </div> {/* 🧊 END NEW WRAPPER DIV */}
     </div>
       {modalMessage && (
