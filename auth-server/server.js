@@ -7,17 +7,19 @@ import chatRoutes from './routes/chat.js';
 import famousPeopleRoutes from "./routes/famousPeople.js";
 
 dotenv.config();
-
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
-app.use(express.json());
+
 app.use(cors({
-  origin: ["http://localhost:5173", "https://stellar-pavlova-647c52.netlify.app"],
+  origin: ["http://localhost:5173", "https://stellar-pavlova-647c52.netlify.app", "https://theairoleplay.com"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
+app.options("*", cors());
+app.use(express.json());
 // ✅ Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/chats', chatRoutes);   // includes /:id/image
