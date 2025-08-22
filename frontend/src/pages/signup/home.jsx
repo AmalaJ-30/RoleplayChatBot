@@ -10,12 +10,12 @@ function Home() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [modalMessage, setModalMessage] = useState("");
-
+  const API = import.meta.env.VITE_API_URL;
   const handleLogin = async () => {
     setError(""); // Clear old errors
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/login", {
+       const res = await fetch(`${API}/api/auth/login`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ username, password }),
