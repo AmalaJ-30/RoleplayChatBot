@@ -65,6 +65,7 @@ async def generate_image(chat_id: str, request: ImageRequest):
     }
 '''
 # backend/image_gen.py
+# pyright: reportMissingImports=false
 import os
 import traceback
 import requests
