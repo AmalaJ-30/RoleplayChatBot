@@ -1,5 +1,6 @@
 // frontend/src/api.js
-const API_BASE = import.meta.env.VITE_API_URL;
+const rawBase= import.meta.env.VITE_API_URL;
+const API_BASE = rawBase.replace(/\/+$/, '');
 
 async function request(path, options = {}) {
   console.log("[api.js] Making request to:", `${API_BASE}${path}`, options);
