@@ -75,10 +75,22 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
+from functools import lru_cache
 
 load_dotenv()
-DALLE_KEY = os.getenv("OPENAI_API_KEY_Dalle") 
-client = OpenAI(api_key=DALLE_KEY)
+def _strip_proxy_env():
+    for k in ("OPENAI_PROXY", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "OPENAI_HTTP_PROXY"):
+        os.environ.pop(k, None)
+
+@lru_cache(maxsize=1)
+def get_openai_client():
+    _strip_proxy_env()
+    key = (
+        os.getenv("OPENAI_API_KEY_Dalle")     # your existing var
+        or os.getenv("OPENAI_API_KEY_DALLE")  # alternate spelling
+        or os.getenv("OPENAI_API_KEY")        # fallback
+    )
+    return OpenAI(api_key=key)
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -106,6 +118,7 @@ async def generate_image(chat_id: str, request: ImageRequest):
 
     try:
         # 👇 Ask for base64 response
+        client = get_openai_client()
         result = client.images.generate(
             model="dall-e-3",
             prompt=prompt,
