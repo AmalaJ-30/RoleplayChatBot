@@ -2,8 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/auth.js';
-//import chatRoutes from './routes/chat.js';
+//import authRoutes from './routes/auth.js';
+import chatRoutes from './routes/chat.js';
 import famousPeopleRoutes from "./routes/famousPeople.js";
 
 dotenv.config();
@@ -19,8 +19,8 @@ app.use(cors({
 app.options("*", cors());
 app.use(express.json());
 // ✅ Mount routes
-app.use('/api/auth', authRoutes);
-//app.use('/api/chats', chatRoutes);   // includes /:id/image
+//app.use('/api/auth', authRoutes);
+app.use('/api/chats', chatRoutes);   // includes /:id/image
 app.use("/api", famousPeopleRoutes);
 //app.use("/uploads", express.static("uploads"));
 
