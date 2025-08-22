@@ -65,17 +65,33 @@ async def generate_image(chat_id: str, request: ImageRequest):
     }
 '''
 # backend/image_gen.py
+# pyright: reportMissingImports=false
 import os
-import base64
 import traceback
+import requests
+import uuid
+import boto3
 from fastapi import APIRouter
 from pydantic import BaseModel
 from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-DALLE_KEY = os.getenv("OPENAI_API_KEY_Dalle")  # 👈 use the one you set
+DALLE_KEY = os.getenv("OPENAI_API_KEY_Dalle") 
 client = OpenAI(api_key=DALLE_KEY)
+
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.getenv("AWS_REGION")
+S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
+
+# ✅ Correct boto3 client init
+s3 = boto3.client(
+    "s3",
+    region_name=AWS_REGION,
+    aws_access_key_id=AWS_ACCESS_KEY_ID,
+    aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+)
 
 router = APIRouter()
 
@@ -94,20 +110,35 @@ async def generate_image(chat_id: str, request: ImageRequest):
             model="dall-e-3",
             prompt=prompt,
             size="1024x1024",
-            response_format="b64_json"
+            response_format="url"
         )
 
         # Extract base64 string
-        image_b64 = result.data[0].b64_json
+        #image_b64 = result.data[0].b64_json
 
         # Convert into data URI for frontend
-        image_url = f"data:image/png;base64,{image_b64}"
+        temp_url = result.data[0].url
+        
+        img_response = requests.get(temp_url)
+        if img_response.status_code != 200:
+           return {"error": "Failed to download image from OpenAI", "url": temp_url}
+        
 
+        filename = f"{uuid.uuid4().hex}.png"
+        s3.put_object(
+            Bucket=S3_BUCKET_NAME,
+            Key=filename,
+            Body=img_response.content,
+            ContentType="image/png"
+        )
+
+        # 4. Build permanent URL
+        s3_url = f"https://{S3_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{filename}"
         return {
             "session_id": request.session_id,
             "person": request.person,
             "role": request.role,
-            "image_url": image_url
+            "image_url": s3_url
         }
 
     except Exception as e:
