@@ -88,7 +88,7 @@ load_dotenv()
 router = APIRouter()
 
 os.environ["LANGCHAIN_TRACKING_V2"] = "true"
-os.environ["OPENAI_API_KEY_DALLE"] = os.getenv("OPENAI_API_KEY_DALLE")
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
 # ✅ Lazy getter — do NOT create ChatOpenAI at import time
 @lru_cache(maxsize=1)
@@ -98,7 +98,7 @@ def get_chat_model():
         os.environ.pop(k, None)
     return ChatOpenAI(
         model="gpt-3.5-turbo",              # or 'gpt-4o-mini'
-        openai_api_key=os.environ.get("OPENAI_API_KEY_DALLE"),
+        openai_api_key=os.environ.get("OPENAI_API_KEY"),
     )
 
 store: dict[str, InMemoryChatMessageHistory] = {}

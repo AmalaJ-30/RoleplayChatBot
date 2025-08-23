@@ -85,9 +85,9 @@ def _strip_proxy_env():
 @lru_cache(maxsize=1)
 def get_openai_client():
     _strip_proxy_env()
-    key = os.getenv("OPENAI_API_KEY_DALLE")   # 👈 use ONE consistent name
+    key = os.getenv("OPENAI_API_KEY")   # 👈 use ONE consistent name
     if not key:
-        raise ValueError("❌ Missing OPENAI_API_KEY_DALLE in environment")
+        raise ValueError("❌ Missing OPENAI_API_KEY in environment")
     return OpenAI(api_key=key)
 
 
