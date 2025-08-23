@@ -82,7 +82,7 @@ from langchain_core.messages import HumanMessage
 from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
+from openai import OpenAI
 load_dotenv()
 
 router = APIRouter()
@@ -115,19 +115,15 @@ class ChatRequest(BaseModel):
     message: str
 
 print("Start chat")
+client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 @router.post("/chat")
 async def chat_endpoint(request: ChatRequest):
-    config = {"configurable": {"session_id": request.session_id}}
-
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", f"You are {request.person}, a {request.role}. Answer all questions as if you are {request.person}."),
-        MessagesPlaceholder(variable_name="messages"),
-    ])
-
-    # ✅ build the chain with the lazily-created model
-    chain = prompt | get_chat_model()
-    with_message_history = RunnableWithMessageHistory(chain, get_session_history)
-
-    response = with_message_history.invoke([HumanMessage(content=request.message)], config=config)
-    return {"reply": response.content}
+    resp = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": f"You are {request.person}, a {request.role}."},
+            {"role": "user", "content": request.message},
+        ]
+    )
+    return {"reply": resp.choices[0].message.content}
