@@ -2,8 +2,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api_keys import router as chat_router
 from image_gen import router as image_router
+from fastapi.responses import JSONResponse
 
 app = FastAPI()
+
 
 # ✅ CORS so frontend & Node can connect
 app.add_middleware(
@@ -34,3 +36,7 @@ async def startup_event():
     print(">>> All registered routes:")
     for route in app.routes:
         print("   ", route.path, route.methods)
+
+@app.options("/{rest_of_path:path}")
+async def preflight_handler(rest_of_path: str):
+    return JSONResponse(content={"ok": True})
