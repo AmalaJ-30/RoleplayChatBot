@@ -267,7 +267,7 @@ if (!isFamous) {
   }
 });
 */
-
+const FASTAPI_URL = process.env.FASTAPI_URL;
 router.post("/:id/image", authMiddleware, async (req, res) => {
   try {
     const { person, role } = req.body;
@@ -290,7 +290,7 @@ router.post("/:id/image", authMiddleware, async (req, res) => {
     }
 
     // 3. Call FastAPI
-    const response = await fetch(`http://127.0.0.1:8001/chats/${id}/image`, {
+    const response = await fetch(`${FASTAPI_URL}/chats/${id}/image`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ session_id: id, person, role })
