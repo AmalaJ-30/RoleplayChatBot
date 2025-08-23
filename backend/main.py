@@ -14,6 +14,7 @@ app.add_middleware(
     "http://localhost:5173",
     "https://stellular-pavlova-647c52.netlify.app",
     "https://theairoleplay.com",
+    "https://stellular-pavlova-647c52.netlify.app",
 ],
     allow_credentials=True,
     allow_methods=["*"],
