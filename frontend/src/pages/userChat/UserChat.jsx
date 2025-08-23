@@ -116,7 +116,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     // Update backend chat with new message
-    await api.put(`/api/chats/${activeChatId}/messages`, { messages: updatedMessages });
+    await api.put(`/chats/${activeChatId}/messages`, { messages: updatedMessages });
 
 
     // Call AI backend for reply
@@ -133,7 +133,7 @@ useEffect(() => {
     setConversation(finalMessages);
 
     // Save final messages to 
-    await api.put(`/api/chats/${activeChatId}/messages`, { messages: finalMessages });
+    await api.put(`/chats/${activeChatId}/messages`, { messages: finalMessages });
 
 
   } catch (error) {
