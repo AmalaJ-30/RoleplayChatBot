@@ -36,7 +36,3 @@ async def startup_event():
     print(">>> All registered routes:")
     for route in app.routes:
         print("   ", route.path, route.methods)
-
-@app.options("/{rest_of_path:path}")
-async def preflight_handler(rest_of_path: str):
-    return JSONResponse(content={"ok": True})
