@@ -85,12 +85,11 @@ def _strip_proxy_env():
 @lru_cache(maxsize=1)
 def get_openai_client():
     _strip_proxy_env()
-    key = (
-        os.getenv("OPENAI_API_KEY_Dalle")     # your existing var
-        or os.getenv("OPENAI_API_KEY_DALLE")  # alternate spelling
-        or os.getenv("OPENAI_API_KEY")        # fallback
-    )
+    key = os.getenv("OPENAI_API_KEY_DALLE")   # 👈 use ONE consistent name
+    if not key:
+        raise ValueError("❌ Missing OPENAI_API_KEY_DALLE in environment")
     return OpenAI(api_key=key)
+
 
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
