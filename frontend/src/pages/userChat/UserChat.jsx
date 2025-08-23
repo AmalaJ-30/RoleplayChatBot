@@ -116,15 +116,8 @@ useEffect(() => {
     const token = localStorage.getItem("token");
 
     // Update backend chat with new message
-    await request(`/api/chats/${activeChatId}/messages`, {
-    //await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ messages: updatedMessages })
-    });
+    await api.put(`/api/chats/${activeChatId}/messages`, { messages: updatedMessages });
+
 
     // Call AI backend for reply
   const response = await fetch(`${FASTAPI_BASE}/chat`, {
@@ -140,15 +133,8 @@ useEffect(() => {
     setConversation(finalMessages);
 
     // Save final messages to 
-    await fetch(`${API_BASE}/api/chats/${activeChatId}/messages`, {
-    //await fetch(`http://localhost:5000/api/chats/${activeChatId}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ messages: finalMessages })
-    });
+    await api.put(`/api/chats/${activeChatId}/messages`, { messages: finalMessages });
+
 
   } catch (error) {
     console.error("Error sending message:", error);
