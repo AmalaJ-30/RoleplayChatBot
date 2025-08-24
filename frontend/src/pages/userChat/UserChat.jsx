@@ -187,7 +187,7 @@ const handleSelection = async () => {
   }
 
   if (!resolvedName) {
-    alert("Oops, not famous enough for me to know 'em. Try someone that's actually important 😉");
+    alert("Oops, please pick a historical figure or a president of the United states 😉");
     return;
   }
 
@@ -302,7 +302,7 @@ const handleRenameChat = async (chatId, newPerson, newRole) => {
     }
 
     if (!resolvedName) {
-      alert("Oops, not famous enough for me to know 'em.");
+      alert("Oops, please pick a historical figure or a president of the united states.");
       return;
     }
 

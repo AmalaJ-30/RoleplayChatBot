@@ -60,7 +60,7 @@ const navigate = useNavigate();
     }
   };
 ******/
-
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
 const handleSubmit = async (e) => {
   e.preventDefault();
 
@@ -74,7 +74,7 @@ const handleSubmit = async (e) => {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/api/auth/signup", {
+    const response = await fetch(`${API_BASE}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
