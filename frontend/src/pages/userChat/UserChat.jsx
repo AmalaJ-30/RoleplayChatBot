@@ -102,6 +102,26 @@ useEffect(() => {
     }
   }, [chats, loadedFromStorage]);
 
+  // ✅ Save conversation + activeChatId
+useEffect(() => {
+  if (activeChatId) {
+    localStorage.setItem("lastActiveChatId", activeChatId);
+    localStorage.setItem("lastConversation", JSON.stringify(conversation));
+  }
+}, [activeChatId, conversation]);
+
+  
+  // ✅ Restore state on mount
+useEffect(() => {
+  const savedChatId = localStorage.getItem("lastActiveChatId");
+  const savedConversation = localStorage.getItem("lastConversation");
+
+  if (savedChatId) setActiveChatId(savedChatId);
+  if (savedConversation) setConversation(JSON.parse(savedConversation));
+
+  setLoadedFromStorage(true);
+}, []);
+
   const handleSendMessage = async () => {
   if (!activeChatId || message.trim() === "") return;
 
@@ -352,8 +372,10 @@ const roles = [
   "Villain",
   "Superhero"
 ];
-
-
+    
+if (!activeChatId || !conversation) {
+    return <div>Loading chat...</div>;
+  }
 
   return (
       <div className={`${styles.pageWrapper} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
