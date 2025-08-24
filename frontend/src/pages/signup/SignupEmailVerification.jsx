@@ -6,11 +6,11 @@ export default function SignupEmailVerification() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const [message, setMessage] = useState("");
-
+  const API_BASE = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
   const handleVerification = async (isApproved) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/auth/verify-email?token=${token}&approve=${isApproved}`, // adjust to your backend
+        `${API_BASE}/auth/verify-email?token=${token}&approve=${isApproved}`, // adjust to your backend
         { method: "POST" }
       );
 
