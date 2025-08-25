@@ -372,10 +372,6 @@ const roles = [
   "Villain",
   "Superhero"
 ];
-    
-if (!activeChatId || !conversation) {
-    return <div>Loading chat...</div>;
-  }
 
   return (
       <div className={`${styles.pageWrapper} ${theme === "dark" ? styles.themeDark : styles.themeLight}`}>
@@ -457,13 +453,20 @@ if (!activeChatId || !conversation) {
     backgroundRepeat: "no-repeat",
   }}
 >
-  <div className={styles.chatbox}>
-    {conversation.map((msg, index) => (
+ <div className={styles.chatbox}>
+  {!activeChatId ? (
+    <div className={styles.placeholder}>Select or start a chat to begin!</div>
+  ) : conversation.length === 0 ? (
+    <div className={styles.loading}>Loading chat...</div>
+  ) : (
+    conversation.map((msg, index) => (
       <div key={index} className={`${styles.chatBubble} ${styles[msg.sender]}`}>
         {msg.text}
       </div>
-    ))}
-  </div>
+    ))
+  )}
+</div>
+
 
 
   <div className={styles.messageInput}>
