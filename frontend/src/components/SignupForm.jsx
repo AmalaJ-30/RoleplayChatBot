@@ -17,54 +17,20 @@ const navigate = useNavigate();
     password: ""
   });
 
-  const naviagte = useNavigate();
-  const [formDatawithoutpassword, setformDatawithoutpassword] = useState ({
-    firstName: "",
-    lastName: "",
-    email: "",
-    username: ""
-  })
   const [error, setError] = useState("");
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
   };
 
-/*  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-     const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
-    if (!strongPassword.test(formData.password)) {
-      setError("Password must be at least 8 characters, include a number and a symbol.");
-      return;
-    }
-
-    try {
-      const response = await fetch("http://localhost:5000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        alert(`Signup successful! Please expect an email from "CampusMind" and verify your email address to be able to login`);
-        navigate("/");
-        console.log(data);
-      } else {
-        alert(data.message || "Signup failed");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error, check console.");
-    }
-  };
-******/
 const API_BASE = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  console.log("🚀 Signup attempt with data:", formDatawithoutpassword);
+  console.log("🚀 Signup attempt with data:", {
+  ...formData,
+  password: "🔒 hidden"
+});
 
   const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
   if (!strongPassword.test(formData.password)) {

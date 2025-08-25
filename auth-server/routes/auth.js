@@ -1,3 +1,4 @@
+
 import express from 'express';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
@@ -17,32 +18,34 @@ dotenv.config();
 // POST /signup
 router.post('/signup', async (req, res) => {
   console.log("Signup route hit!");
-
   const verificationToken = crypto.randomBytes(32).toString('hex');
+
   try {
     const { firstName, lastName, email, username, password } = req.body;
 
-    // 1️⃣ Check if email or username already exists
-   const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Email or Username already taken' });
+    // 1️⃣ Validate required fields
+    if (!firstName || !lastName || !email || !username || !password) {
+      return res.status(400).json({ message: "All fields are required." });
     }
 
-      /*const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
-  if (!strongPassword.test(password)) {
-    return res.status(400).json({ message: "Password must be at least 8 characters, include a number and a symbol." });
-  }*/
-        const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
+    // 2️⃣ Check if email or username already exists
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email or Username already taken" });
+    }
+
+    // 3️⃣ Validate password strength
+    const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,128}$/;
     if (!strongPassword.test(password)) {
       return res.status(400).json({ 
-        message: "Password must be at least 8 characters, include a number and a symbol." 
+        message: "Password must be 8–128 characters, include a number and a symbol." 
       });
     }
 
-    // 2️⃣ Hash password
+    // 4️⃣ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3️⃣ Save new user
+    // 5️⃣ Save new user first
     const newUser = new User({
       firstName,
       lastName,
@@ -50,23 +53,30 @@ router.post('/signup', async (req, res) => {
       username,
       password: hashedPassword,
       verified: false,
-      verificationToken: verificationToken
+      verificationToken
     });
-    
-
-// ... after saving the user to DB:
-console.log("About to send verification email to:", email, verificationToken);
-await sendVerificationEmail(email, verificationToken);
-console.log("sendVerificationEmail finished!");
 
     await newUser.save();
+
+    // 6️⃣ Then send verification email
+    console.log("About to send verification email to:", email);
+    await sendVerificationEmail(email, verificationToken);
+    console.log("sendVerificationEmail finished!");
+
     res.status(201).json({ message: 'User created successfully!' });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("🔥 Signup error:", err);
+
+    // Duplicate key error from Mongo
+    if (err.code === 11000) {
+      return res.status(409).json({ message: "Email or username already exists." });
+    }
+
+    res.status(500).json({ message: 'Server error during signup', error: err.message });
   }
 });
+
 
 // backend/routes/auth.js
 /*router.post("/verify-email", async (req, res) => {
