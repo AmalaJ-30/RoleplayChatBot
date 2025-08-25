@@ -169,7 +169,7 @@
   flex: 1;                       /* ✅ take all space above input */
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;     /* ✅ pin messages to bottom */
+  /*justify-content: flex-end;     /* ✅ pin messages to bottom */
   overflow-y: auto;
   padding: 20px;
 }
