@@ -38,7 +38,7 @@ const handleSubmit = async (e) => {
   const strongPassword = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/;
   if (!strongPassword.test(formData.password)) {
     console.log("❌ Weak password, blocking submit");
-    setError("Password must be between 2 and 128 characters, include a number and a symbol");
+    setError("Password must be between 8 and 128 characters, include a number and a symbol");
     return;
   }
    
