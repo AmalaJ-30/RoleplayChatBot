@@ -56,14 +56,23 @@ router.post('/signup', async (req, res) => {
       verificationToken
     });
 
-    await newUser.save();
+    try {
+  await newUser.save();
 
-    // 6️⃣ Then send verification email
-    console.log("About to send verification email to:", email);
+  try {
     await sendVerificationEmail(email, verificationToken);
-    console.log("sendVerificationEmail finished!");
+    console.log("Verification email sent:", email);
+  } catch (mailErr) {
+    console.error("❌ Email send failed:", mailErr);
+    // Don’t block signup, just warn user
+  }
 
-    res.status(201).json({ message: 'User created successfully!' });
+  res.status(201).json({ message: "User created successfully!" });
+} catch (err) {
+  console.error("🔥 Signup error:", err);
+  res.status(500).json({ message: "Server error during signup" });
+}
+
 
   } catch (err) {
     console.error("🔥 Signup error:", err);
