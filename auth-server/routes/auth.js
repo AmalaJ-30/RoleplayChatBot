@@ -45,7 +45,7 @@ router.post('/signup', async (req, res) => {
     // 4️⃣ Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 5️⃣ Save new user first
+    // 5️⃣ Save new user
     const newUser = new User({
       firstName,
       lastName,
@@ -56,35 +56,33 @@ router.post('/signup', async (req, res) => {
       verificationToken
     });
 
+    await newUser.save();
+
+    // 6️⃣ Try sending email (but don’t block signup)
     try {
-  await newUser.save();
+      await sendVerificationEmail(email, verificationToken);
+      console.log("📧 Verification email sent:", email);
+    } catch (mailErr) {
+      console.error("❌ Email send failed:", mailErr);
+      if (mailErr.response) {
+        console.error("Postmark response:", mailErr.response.data);
+      }
+    }
 
-  try {
-    await sendVerificationEmail(email, verificationToken);
-    console.log("Verification email sent:", email);
-  } catch (mailErr) {
-    console.error("❌ Email send failed:", mailErr);
-    // Don’t block signup, just warn user
-  }
-
-  res.status(201).json({ message: "User created successfully!" });
-} catch (err) {
-  console.error("🔥 Signup error:", err);
-  res.status(500).json({ message: "Server error during signup" });
-}
-
+    // 7️⃣ Respond after user is saved
+    return res.status(201).json({ message: "User created successfully!" });
 
   } catch (err) {
     console.error("🔥 Signup error:", err);
 
-    // Duplicate key error from Mongo
     if (err.code === 11000) {
       return res.status(409).json({ message: "Email or username already exists." });
     }
 
-    res.status(500).json({ message: 'Server error during signup', error: err.message });
+    return res.status(500).json({ message: "Server error during signup", error: err.message });
   }
 });
+
 
 
 // backend/routes/auth.js

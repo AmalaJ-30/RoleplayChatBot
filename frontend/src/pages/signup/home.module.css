@@ -18,7 +18,7 @@
   width: 100vw;
     background: 
   linear-gradient(135deg, #1e1b4b, #6d28d9, #8b5cf6),
-  url("https://transparenttextures.com/patterns/gray-floral.png"); /* C:\Users\shant\Downloads\2025-08-19 16_31_55-.png*/
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='20' cy='20' r='3'/%3E%3C/g%3E%3C/svg%3E"); /* C:\Users\shant\Downloads\2025-08-19 16_31_55-.png*/
 background-size: cover;
 background-blend-mode: overlay;
 }
@@ -85,24 +85,25 @@ background-blend-mode: overlay;
 }
 
 .warningText {
-  color: rgb(0, 0, 0);
+  color: #f5f5f5;  /* light grey, nearly white */
   font-weight: bold;
   margin-top: 20px;
   max-width: 400px;
-  text-align: center; /* 👈 THIS is what you're missing */
+  text-align: center;
   margin-left: auto;
   margin-right: auto;
 }
 
 .disclaimer {
   font-size: 14px;
-  color:  rgb(0, 0, 0);
+  color: #d1d5db;  /* soft grey */
   margin-top: 10px;
   max-width: 400px;
-  text-align: center; /* 👈 Same deal */
+  text-align: center;
   margin-left: auto;
   margin-right: auto;
 }
+
 
 .forgotPassword {
   text-align: right;   /* pushes it to the right side */
@@ -116,4 +117,14 @@ background-blend-mode: overlay;
 
 .forgotPassword:hover {
   color: #ffffff; /* brighter on hover */
+}
+
+.title a {
+  color: #ffd700;   /* gold/yellow that contrasts well on purple */
+  font-weight: bold;
+  text-decoration: underline; /* optional: makes it look clickable */
+}
+
+.title a:hover {
+  color: #ffffff;   /* white on hover */
 }

@@ -6,6 +6,8 @@ import SignupEmailVerification from "./pages/signup/SignupEmailVerification.jsx"
 import ResetPassword from "./pages/signup/resetpasswordpage.jsx";
 import Profile from "./pages/userChat/Profile.jsx";
 import PrivateRoute from "./pages/userChat/PrivateRoute";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+
 function App() {
   return (
     <Routes>
@@ -29,7 +31,7 @@ function App() {
             </PrivateRoute>
           }
         />
-
+      <Route path="/privacy" element={<PrivacyPolicy />} />
 
     </Routes>
   );
