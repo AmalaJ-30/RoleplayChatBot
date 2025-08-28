@@ -62,6 +62,8 @@ router.post('/signup', async (req, res) => {
     try {
       await sendVerificationEmail(email, verificationToken);
       console.log("📧 Verification email sent:", email);
+      
+     return res.status(201).json({ message: "User created successfully!" });
     } catch (mailErr) {
       console.error("❌ Email send failed:", mailErr);
       if (mailErr.response) {
@@ -70,7 +72,7 @@ router.post('/signup', async (req, res) => {
     }
 
     // 7️⃣ Respond after user is saved
-    return res.status(201).json({ message: "User created successfully!" });
+    return res.status(500).json({ message: "Signup worked, but email could not be sent." });
 
   } catch (err) {
     console.error("🔥 Signup error:", err);
